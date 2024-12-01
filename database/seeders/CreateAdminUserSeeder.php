@@ -43,7 +43,7 @@ class CreateAdminUserSeeder extends Seeder
 
             // Contract Management
             'view contract',
-            'add contract',
+            'create contract',
             'edit contract',
             'delete contract',
             'manage contracts',  // Overall contract management
@@ -81,7 +81,7 @@ class CreateAdminUserSeeder extends Seeder
             'view property',
             'create property',
             'view contract',
-            'add contract',
+            'create contract',
             'view tenants'
         ]);
 
