@@ -107,8 +107,8 @@
         <!-- Modal content -->
         <div class="relative bg-gray-100 rounded-lg shadow">
             <!-- Modal header -->
-            <div class="flex items-start justify-between p-4 border-b rounded-t">
-                <h3 class="text-xl font-semibold text-gray-900">
+            <div class="flex items-start justify-between p-2 border-b rounded-t">
+                <h3 class="text-xl font-semibold text-gray-600">
                     Property Details
                 </h3>
                 <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" data-modal-toggle="viewPropertyModal">
@@ -120,7 +120,7 @@
                 </button>
             </div>
             <!-- Modal body -->
-            <div id="modalContent" class="p-6 space-y-6">
+            <div id="modalContent" class="p-4 space-y-3">
                 <!-- Content will be loaded dynamically -->
             </div>
             <!-- Modal footer -->

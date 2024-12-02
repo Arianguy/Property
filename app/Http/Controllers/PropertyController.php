@@ -10,7 +10,7 @@ class PropertyController extends Controller
 {
     public function index()
     {
-        $properties = Property::with('owner')->paginate(20);
+        $properties = Property::with('owner')->orderBy('ID')->paginate(40);
         return view('properties.index', compact('properties'));
     }
 

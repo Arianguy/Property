@@ -40,8 +40,10 @@
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                         <option value="">Select Class</option>
                                         <option value="1 BHK" {{ old('class', $property->class) === '1 BHK' ? 'selected' : '' }}>1 BHK</option>
-                                        <option value="Commercial" {{ old('class', $property->class) === 'Commercial' ? 'selected' : '' }}>Commercial</option>
-                                        <option value="Mixed Use" {{ old('class', $property->class) === 'Mixed Use' ? 'selected' : '' }}>Mixed Use</option>
+                                        <option value="2 BHK" {{ old('class', $property->class) === '2 BHK' ? 'selected' : '' }}>2 BHK</option>
+                                        <option value="STUDIO" {{ old('class', $property->class) === 'STUDIO' ? 'selected' : '' }}>STUDIO</option>
+                                        <option value="WH" {{ old('class', $property->class) === 'WH' ? 'selected' : '' }}>WAREHOUSE</option>
+                                        <option value="OFFICE" {{ old('class', $property->class) === 'OFFICE' ? 'selected' : '' }}>OFFICE</option>
                                     </select>
                                     @error('class')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -55,9 +57,8 @@
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                         <option value="">Select Type</option>
                                         <option value="Residential" {{ old('type', $property->type) === 'Residential' ? 'selected' : '' }}>Residential</option>
-                                        <option value="Villa" {{ old('type', $property->type) === 'Villa' ? 'selected' : '' }}>Villa</option>
-                                        <option value="Office" {{ old('type', $property->type) === 'Office' ? 'selected' : '' }}>Office</option>
-                                        <option value="Retail" {{ old('type', $property->type) === 'Retail' ? 'selected' : '' }}>Retail</option>
+                                        <option value="Commercial" {{ old('type', $property->type) === 'Commercial' ? 'selected' : '' }}>Commercial</option>
+                                        <option value="Land" {{ old('type', $property->type) === 'Land' ? 'selected' : '' }}>Land</option>
                                     </select>
                                     @error('type')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -94,7 +95,6 @@
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                         <option value="None" {{ old('mortgage_status', $property->mortgage_status) === 'None' ? 'selected' : '' }}>None</option>
                                         <option value="Mortgaged" {{ old('mortgage_status', $property->mortgage_status) === 'Mortgaged' ? 'selected' : '' }}>Mortgaged</option>
-                                        <option value="Released" {{ old('mortgage_status', $property->mortgage_status) === 'Released' ? 'selected' : '' }}>Released</option>
                                     </select>
                                     @error('mortgage_status')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>

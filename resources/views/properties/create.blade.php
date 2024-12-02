@@ -37,11 +37,13 @@
                                     <label for="class" class="block text-sm font-medium text-gray-700">Property Class</label>
                                     <select name="class" id="class" required
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                        <option value="">Select Class</option>
-                                        <option value="Residential" {{ old('class') == 'Residential' ? 'selected' : '' }}>Residential</option>
-                                        <option value="Commercial" {{ old('class') == 'Commercial' ? 'selected' : '' }}>Commercial</option>
-                                        <option value="Mixed Use" {{ old('class') == 'Mixed Use' ? 'selected' : '' }}>Mixed Use</option>
-                                    </select>
+                                            <option value="">Select Class</option>
+                                            <option value="1 BHK" {{ old('class') === '1 BHK' ? 'selected' : '' }}>1 BHK</option>
+                                            <option value="2 BHK" {{ old('class') === '2 BHK' ? 'selected' : '' }}>2 BHK</option>
+                                            <option value="STUDIO" {{ old('class') === 'STUDIO' ? 'selected' : '' }}>STUDIO</option>
+                                            <option value="WH" {{ old('class') === 'WH' ? 'selected' : '' }}>WAREHOUSE</option>
+                                            <option value="OFFICE" {{ old('class') === 'OFFICE' ? 'selected' : '' }}>OFFICE</option>
+                                        </select>
                                     @error('class')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
@@ -52,12 +54,11 @@
                                     <label for="type" class="block text-sm font-medium text-gray-700">Property Type</label>
                                     <select name="type" id="type" required
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                        <option value="">Select Type</option>
-                                        <option value="Apartment" {{ old('type') == 'Apartment' ? 'selected' : '' }}>Apartment</option>
-                                        <option value="Villa" {{ old('type') == 'Villa' ? 'selected' : '' }}>Villa</option>
-                                        <option value="Office" {{ old('type') == 'Office' ? 'selected' : '' }}>Office</option>
-                                        <option value="Retail" {{ old('type') == 'Retail' ? 'selected' : '' }}>Retail</option>
-                                    </select>
+                                            <option value="">Select Type</option>
+                                            <option value="Residential" {{ old('type') === 'Residential' ? 'selected' : '' }}>Residential</option>
+                                            <option value="Commercial" {{ old('type') === 'Commercial' ? 'selected' : '' }}>Commercial</option>
+                                            <option value="Land" {{ old('type') === 'Land' ? 'selected' : '' }}>Land</option>
+                                        </select>
                                     @error('type')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
@@ -91,10 +92,9 @@
                                     <label for="mortgage_status" class="block text-sm font-medium text-gray-700">Mortgage Status</label>
                                     <select name="mortgage_status" id="mortgage_status" required
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                        <option value="None" {{ old('mortgage_status') == 'None' ? 'selected' : '' }}>None</option>
-                                        <option value="Mortgaged" {{ old('mortgage_status') == 'Mortgaged' ? 'selected' : '' }}>Mortgaged</option>
-                                        <option value="Released" {{ old('mortgage_status') == 'Released' ? 'selected' : '' }}>Released</option>
-                                    </select>
+                                            <option value="None" {{ old('mortgage_status') === 'None' ? 'selected' : '' }}>None</option>
+                                            <option value="Mortgaged" {{ old('mortgage_status') === 'Mortgaged' ? 'selected' : '' }}>Mortgaged</option>
+                                        </select>
                                     @error('mortgage_status')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
