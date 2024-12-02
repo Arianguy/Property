@@ -17,8 +17,8 @@
 class="bg-white border-gray-200 dark:bg-gray-900">
     <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 rtl:space-x-reverse">
-            {{-- <x-application-logo class="h-8 w-auto fill-current text-gray-800 dark:text-gray-200" /> --}}
-            <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">{{ config('app.name') }}</span>
+            <x-application-logo class="h-8 w-auto fill-current text-gray-800 dark:text-gray-200" />
+            {{-- <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">{{ config('app.name') }}</span> --}}
         </a>
 
         <div class="flex items-center md:order-2">
