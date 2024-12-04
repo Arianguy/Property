@@ -143,6 +143,18 @@
                         <span class="text-gray-500">Visible to Public:</span>
                         <span class="text-gray-900">{{ $property->is_visible ? 'Yes' : 'No' }}</span>
                     </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Download Sales Deed:</span>
+                        @if($property->getFirstMedia('salesdeed'))
+                            <a href="{{ route('properties.downloadSalesDeed', $property->id) }}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Download
+                            </a>
+                        @else
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                Not Available
+                            </span>
+                     @endif
+                    </div>
                 </div>
             </div>
         </div>

@@ -5,7 +5,7 @@
                 {{ __('Properties') }}
             </h2>
             @can('create property')
-    <a href="{{ route('properties.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+    <a href="{{ route('properties.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded inline-flex items-center">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
         </svg>
@@ -46,9 +46,9 @@
                                         <td class="py-2 px-4 border-b">{{ number_format($property->purchase_value, 0) }}</td>
                                         <td class="py-2 px-4 border-b">
     @if($property->getFirstMedia('salesdeed'))
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            Available
-        </span>
+        <a href="{{ route('properties.downloadSalesDeed', $property->id) }}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            Download
+        </a>
     @else
         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
             Not Available

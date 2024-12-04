@@ -48,23 +48,13 @@ class PropertyController extends Controller
     public function downloadSalesDeed($id)
     {
         $property = Property::findOrFail($id);
-
-        // Check authorization
-        if (!auth()->user()->can('view', $property)) {
-            abort(403);
-        }
-
         $media = $property->getFirstMedia('salesdeed');
 
-        if (!$media) {
-            abort(404, 'Document not found');
+        if ($media) {
+            return response()->download($media->getPath());
         }
 
-        return response()->file($media->getPath(), [
-            'Content-Type' => $media->mime_type,
-            'Content-Disposition' => 'inline; filename="' . $media->file_name . '"',
-            'Cache-Control' => 'private, must-revalidate, max-age=3600'
-        ]);
+        return abort(404);
     }
 
     public function store(Request $request)

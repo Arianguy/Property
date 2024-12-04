@@ -68,8 +68,8 @@ Route::middleware(['auth'])->group(function () {
             ->middleware('permission:edit property')
             ->name('edit.search'); // Ensure this route is included
 
-        Route::get('properties/{property}/sales-deed', [PropertyController::class, 'downloadSalesDeed'])
-            ->name('properties.sales-deed')
+        Route::get('/{id}/download-sales-deed', [PropertyController::class, 'downloadSalesDeed'])
+            ->name('downloadSalesDeed')
             ->middleware('auth');
     });
 });
