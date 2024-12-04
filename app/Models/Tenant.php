@@ -2,29 +2,35 @@
 
 namespace App\Models;
 
-use App\Models\Property;
 use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Owner extends Model implements HasMedia
+class Tenant extends Model implements HasMedia
 {
     use HasFactory;
     use InteractsWithMedia;
+
     protected $fillable = [
-        'name',
+        'fname',
         'eid',
         'eidexp',
         'nationality',
         'email',
         'mobile',
-        'nakheelno',
+        'visa',
+        'passportno',
+        'passexp',
+        'eidfront',
+        'eidback',
+        'frontpass',
+        'backpass',
+        'visa_img'
     ];
 
-    public function properties()
+    public function contracts()
     {
-        return $this->hasMany(Property::class);
+        return $this->hasMany(Contract::class);
     }
 }

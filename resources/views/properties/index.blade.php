@@ -102,11 +102,11 @@
 
 
 <!-- Flowbite Modal -->
-<div id="viewPropertyModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full p-4 md:inset-0 h-modal md:h-full">
-    <div class="relative w-full h-full max-w-4xl md:h-auto">
-        <!-- Modal content -->
-        <div class="relative bg-gray-100 rounded-lg shadow">
-            <!-- Modal header -->
+<div id="viewPropertyModal" tabindex="-1" aria-hidden="true" class="hidden fixed inset-0 z-50 overflow-y-auto" data-modal-target="viewPropertyModal">
+    <div class="flex items-center justify-center min-h-screen px-4 text-center">
+        <div class="fixed inset-0 transition-opacity bg-gray-200 opacity-100"></div> <!-- Grey Transparent Backdrop -->
+        <div class="relative w-full max-w-4xl p-4 mx-auto bg-white rounded-lg shadow-lg">
+            <!-- Modal content -->
             <div class="flex items-start justify-between p-2 border-b rounded-t">
                 <h3 class="text-xl font-semibold text-gray-600">
                     Property Details
@@ -148,6 +148,28 @@
                 modalContent.innerHTML = '<div class="text-red-500">Failed to load content.</div>';
             });
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('viewPropertyModal');
+        const modalToggle = document.querySelector('[data-modal-toggle="viewPropertyModal"]');
+
+        // Function to toggle modal visibility
+        function toggleModal() {
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+        }
+
+        if (modalToggle) {
+            modalToggle.addEventListener('click', toggleModal);
+        }
+
+        // Close modal when clicking outside of the modal content
+        modal.addEventListener('click', function (event) {
+            if (event.target === modal) {
+                toggleModal();
+            }
+        });
+    });
     </script>
 
 
