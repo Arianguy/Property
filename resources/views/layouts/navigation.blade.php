@@ -89,42 +89,64 @@ class="bg-white border-gray-200 dark:bg-gray-900">
         class="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 z-50"
     >
         <div class="relative">
-            <button
-                @mouseenter="propOpen = true"
+                @can('view property')
+                <a href="{{ route('properties.index') }}"
                 class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-between"
+                >
+                    {{ __('Property') }}
+                </a>
+                @endcan
+
+                @can('view tenants')
+                <a href="{{ route('properties.index') }}"
+                class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-between"
+                >
+                    {{ __('Tenant') }}
+                </a>
+                @endcan
+
+                @can('view contract')
+                <a href="{{ route('properties.index') }}"
+                class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-between"
+                >
+                    {{ __('Contract') }}
+                </a>
+                @endcan
+
+           <button
+                @mouseenter="propOpen = true"
+                class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-between relative"
             >
-                {{ __('Property') }}
+                {{ __('Receipts') }}
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
                 </svg>
             </button>
-
-            <!-- Property Submenu -->
             <div
                 x-show="propOpen"
                 @mouseleave="propOpen = false"
-                class="absolute left-full top-0 w-48 mt-0 -ml-1 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5"
+                class="absolute left-full top-0 mt-2 ml-2 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5"
             >
                 @can('view property')
                 <a href="{{ route('properties.index') }}"
                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
-                    {{ __('View') }}
+                    {{ __('Cash') }}
                 </a>
                 @endcan
 
                 @can('create property')  <!-- This is the correct permission name from your seeder -->
                 <a href="{{ route('properties.create') }}"
                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
-                    {{ __('Add') }}
+                    {{ __('Cheques') }}
                 </a>
                 @endcan
 
-                @can('edit property')
+                {{-- @can('edit property')
                 <a href="{{ route('properties.edit.search') }}"
                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
                     {{ __('Update') }}
                 </a>
-                @endcan
+                @endcan --}}
             </div>
         </div>
     </div>
