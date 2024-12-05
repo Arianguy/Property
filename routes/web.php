@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\TenantController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PermissionController;
@@ -74,6 +75,45 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
+// Tenant Management Routes
+Route::middleware(['auth'])->group(function () {
+    Route::prefix('tenants')->name('tenants.')->group(function () {
+        Route::get('/', [TenantController::class, 'index'])
+            ->middleware('permission:view tenants')
+            ->name('index');
 
+        Route::get('/create', [TenantController::class, 'create'])
+            ->middleware('permission:create tenants')
+            ->name('create');
+
+        Route::post('/', [TenantController::class, 'store'])
+            ->middleware('permission:create tenants')
+            ->name('store');
+
+        Route::get('/{property}', [TenantController::class, 'show'])
+            ->middleware('permission:view tenants')
+            ->name('show');
+
+        Route::get('/{property}/edit', [TenantController::class, 'edit'])
+            ->middleware('permission:edit tenants')
+            ->name('edit');
+
+        Route::put('/{property}', [TenantController::class, 'update'])
+            ->middleware('permission:edit tenants')
+            ->name('update');
+
+        Route::delete('/{property}', [TenantController::class, 'destroy'])
+            ->middleware('permission:delete tenants')
+            ->name('destroy');
+
+        Route::get('/edit/search', [TenantController::class, 'editSearch'])
+            ->middleware('permission:edit tenants')
+            ->name('edit.search'); // Ensure this route is included
+
+        // Route::get('/{id}/download-sales-deed', [TenantController::class, 'downloadSalesDeed'])
+        //     ->name('downloadSalesDeed')
+        //     ->middleware('auth');
+    });
+});
 
 require __DIR__ . '/auth.php';
