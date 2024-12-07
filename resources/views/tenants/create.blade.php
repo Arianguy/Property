@@ -1,11 +1,11 @@
-<!-- resources/views/properties/create.blade.php -->
+<!-- resources/views/tenants/create.blade.php -->
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Add New Property') }}
+                {{ __('Add New Tenant') }}
             </h2>
-            <a href="{{ route('properties.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+            <a href="{{ route('tenants.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
                 {{ __('Back to List') }}
             </a>
         </div>
@@ -15,278 +15,94 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
-                    <form method="POST" action="{{ route('properties.store') }}" class="space-y-6" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('tenants.store') }}" class="space-y-6">
                         @csrf
 
-                        <!-- Basic Information -->
+                        <!-- Tenant Information -->
                         <div class="bg-gray-50 p-4 rounded-lg space-y-4">
-                            <h3 class="text-lg font-medium text-gray-900">Basic Information</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <!-- Property Name -->
-                                <div>
-                                    <label for="name" class="block text-sm font-medium text-gray-700">Property Name</label>
-                                    <input type="text" name="name" id="name" value="{{ old('name') }}" required
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('name')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
-
-                                <!-- Property Class -->
-                                <div>
-                                    <label for="class" class="block text-sm font-medium text-gray-700">Property Class</label>
-                                    <select name="class" id="class" required
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                            <option value="">Select Class</option>
-                                            <option value="1 BHK" {{ old('class') === '1 BHK' ? 'selected' : '' }}>1 BHK</option>
-                                            <option value="2 BHK" {{ old('class') === '2 BHK' ? 'selected' : '' }}>2 BHK</option>
-                                            <option value="STUDIO" {{ old('class') === 'STUDIO' ? 'selected' : '' }}>STUDIO</option>
-                                            <option value="WH" {{ old('class') === 'WH' ? 'selected' : '' }}>WAREHOUSE</option>
-                                            <option value="OFFICE" {{ old('class') === 'OFFICE' ? 'selected' : '' }}>OFFICE</option>
-                                        </select>
-                                    @error('class')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
-
-                                <!-- Property Type -->
-                                <div>
-                                    <label for="type" class="block text-sm font-medium text-gray-700">Property Type</label>
-                                    <select name="type" id="type" required
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                            <option value="">Select Type</option>
-                                            <option value="Residential" {{ old('type') === 'Residential' ? 'selected' : '' }}>Residential</option>
-                                            <option value="Commercial" {{ old('type') === 'Commercial' ? 'selected' : '' }}>Commercial</option>
-                                            <option value="Land" {{ old('type') === 'Land' ? 'selected' : '' }}>Land</option>
-                                        </select>
-                                    @error('type')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Property Details -->
-                        <div class="bg-gray-50 p-4 rounded-lg space-y-4">
-                            <h3 class="text-lg font-medium text-gray-900">Property Details</h3>
+                            <h3 class="text-lg font-medium text-gray-900">Tenant Information</h3>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label for="purchase_date" class="block text-sm font-medium text-gray-700">Purchase Date</label>
-                                    <input type="date" name="purchase_date" id="purchase_date" value="{{ old('purchase_date') }}" required
+                                    <label for="fname" class="block text-sm font-medium text-gray-700">Full Name</label>
+                                    <input type="text" name="fname" id="fname" value="{{ old('fname') }}" required
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('purchase_date')
+                                    @error('fname')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
                                 </div>
 
                                 <div>
-                                    <label for="title_deed_no" class="block text-sm font-medium text-gray-700">Title Deed Number</label>
-                                    <input type="text" name="title_deed_no" id="title_deed_no" value="{{ old('title_deed_no') }}" required
+                                    <label for="eid" class="block text-sm font-medium text-gray-700">Emirates ID (Only Number)</label>
+                                    <input type="text" name="eid" id="eid" value="{{ old('eid') }}" required
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('title_deed_no')
+                                    @error('eid')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
                                 </div>
 
                                 <div>
-                                    <label for="mortgage_status" class="block text-sm font-medium text-gray-700">Mortgage Status</label>
-                                    <select name="mortgage_status" id="mortgage_status" required
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                            <option value="None" {{ old('mortgage_status') === 'None' ? 'selected' : '' }}>None</option>
-                                            <option value="Mortgaged" {{ old('mortgage_status') === 'Mortgaged' ? 'selected' : '' }}>Mortgaged</option>
-                                        </select>
-                                    @error('mortgage_status')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Location Information -->
-                        <div class="bg-gray-50 p-4 rounded-lg space-y-4">
-                            <h3 class="text-lg font-medium text-gray-900">Location Information</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label for="community" class="block text-sm font-medium text-gray-700">Community</label>
-                                    <input type="text" name="community" id="community" value="{{ old('community') }}" required
+                                    <label for="eidexp" class="block text-sm font-medium text-gray-700">Emirates ID Expiry</label>
+                                    <input type="date" name="eidexp" id="eidexp" value="{{ old('eidexp') }}" required
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('community')
+                                    @error('eidexp')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
                                 </div>
 
                                 <div>
-                                    <label for="plot_no" class="block text-sm font-medium text-gray-700">Plot Number</label>
-                                    <input type="number" name="plot_no" id="plot_no" value="{{ old('plot_no') }}" required
+                                    <label for="nationality" class="block text-sm font-medium text-gray-700">Nationality</label>
+                                    <input type="text" name="nationality" id="nationality" value="{{ old('nationality') }}" required
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('plot_no')
+                                    @error('nationality')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
                                 </div>
 
                                 <div>
-                                    <label for="bldg_no" class="block text-sm font-medium text-gray-700">Building Number</label>
-                                    <input type="number" name="bldg_no" id="bldg_no" value="{{ old('bldg_no') }}" required
+                                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                                    <input type="email" name="email" id="email" value="{{ old('email') }}" required
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('bldg_no')
+                                    @error('email')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
                                 </div>
 
                                 <div>
-                                    <label for="bldg_name" class="block text-sm font-medium text-gray-700">Building Name</label>
-                                    <input type="text" name="bldg_name" id="bldg_name" value="{{ old('bldg_name') }}" required
+                                    <label for="mobile" class="block text-sm font-medium text-gray-700">Mobile (UAE mobile number 050..)</label>
+                                    <input type="text" name="mobile" id="mobile" value="{{ old('mobile') }}" required
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('bldg_name')
+                                    @error('mobile')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
                                 </div>
 
                                 <div>
-                                    <label for="property_no" class="block text-sm font-medium text-gray-700">Property Number</label>
-                                    <input type="text" name="property_no" id="property_no" value="{{ old('property_no') }}" required
+                                    <label for="visa" class="block text-sm font-medium text-gray-700">Visa</label>
+                                    <input type="text" name="visa" id="visa" value="{{ old('visa') }}" required
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('property_no')
+                                    @error('visa')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
                                 </div>
 
                                 <div>
-                                    <label for="floor_detail" class="block text-sm font-medium text-gray-700">Floor Detail</label>
-                                    <input type="text" name="floor_detail" id="floor_detail" value="{{ old('floor_detail') }}" required
+                                    <label for="passportno" class="block text-sm font-medium text-gray-700">Passport No</label>
+                                    <input type="text" name="passportno" id="passportno" value="{{ old('passportno') }}" required
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('floor_detail')
+                                    @error('passportno')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
                                 </div>
-                            </div>
-                        </div>
 
-                        <!-- Area Information -->
-                        <div class="bg-gray-50 p-4 rounded-lg space-y-4">
-                            <h3 class="text-lg font-medium text-gray-900">Area Information</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label for="suite_area" class="block text-sm font-medium text-gray-700">Suite Area</label>
-                                    <input type="number" step="0.01" name="suite_area" id="suite_area" value="{{ old('suite_area') }}" required
+                                    <label for="passexp" class="block text-sm font-medium text-gray-700">Passport Expiry</label>
+                                    <input type="date" name="passexp" id="passexp" value="{{ old('passexp') }}" required
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('suite_area')
+                                    @error('passexp')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
                                 </div>
 
-                                <div>
-                                    <label for="balcony_area" class="block text-sm font-medium text-gray-700">Balcony Area</label>
-                                    <input type="number" step="0.01" name="balcony_area" id="balcony_area" value="{{ old('balcony_area') }}" required
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('balcony_area')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
-
-                                <div>
-                                    <label for="area_sq_mter" class="block text-sm font-medium text-gray-700">Area (sq. meters)</label>
-                                    <input type="number" step="0.01" name="area_sq_mter" id="area_sq_mter" value="{{ old('area_sq_mter') }}" required
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('area_sq_mter')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
-
-                                <div>
-                                    <label for="common_area" class="block text-sm font-medium text-gray-700">Common Area</label>
-                                    <input type="number" step="0.01" name="common_area" id="common_area" value="{{ old('common_area') }}" required
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('common_area')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
-
-                                <div>
-                                    <label for="area_sq_feet" class="block text-sm font-medium text-gray-700">Area (sq. feet)</label>
-                                    <input type="number" step="0.01" name="area_sq_feet" id="area_sq_feet" value="{{ old('area_sq_feet') }}" required
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('area_sq_feet')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Financial Information -->
-                        <div class="bg-gray-50 p-4 rounded-lg space-y-4">
-                            <h3 class="text-lg font-medium text-gray-900">Financial & Additional Information</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label for="owner_id" class="block text-sm font-medium text-gray-700">Owner</label>
-                                    <select name="owner_id" id="owner_id" required
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                        <option value="">Select Owner</option>
-                                        @foreach($owners as $owner)
-                                            <option value="{{ $owner->id }}" {{ old('owner_id') == $owner->id ? 'selected' : '' }}>{{ $owner->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('owner_id')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
-
-                                <div>
-                                    <label for="purchase_value" class="block text-sm font-medium text-gray-700">Purchase Value</label>
-                                    <input type="number" name="purchase_value" id="purchase_value" value="{{ old('purchase_value') }}" required
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('purchase_value')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
-
-                                <div>
-                                    <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                                    <select name="status" id="status" required
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                        <option value="Available" {{ old('status') == 'Available' ? 'selected' : '' }}>Available</option>
-                                        <option value="Rented" {{ old('status') == 'Rented' ? 'selected' : '' }}>Rented</option>
-                                        <option value="Under Maintenance" {{ old('status') == 'Under Maintenance' ? 'selected' : '' }}>Under Maintenance</option>
-                                    </select>
-                                    @error('status')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
-
-                                <div>
-                                    <label for="dewa_premise_no" class="block text-sm font-medium text-gray-700">DEWA Premise No.</label>
-                                    <input type="number" name="dewa_premise_no" id="dewa_premise_no" value="{{ old('dewa_premise_no') }}"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('dewa_premise_no')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
-
-                                <div>
-                                    <label for="dewa_account_no" class="block text-sm font-medium text-gray-700">DEWA Account No.</label>
-                                    <input type="number" name="dewa_account_no" id="dewa_account_no" value="{{ old('dewa_account_no') }}"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('dewa_account_no')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
-
-                                <div>
-                                    <label for="salesdeed" class="block text-sm font-medium text-gray-700">Sales Deed</label>
-                                    <input type="file" name="salesdeed" id="salesdeed" required
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('salesdeed')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="mt-4">
-                                <label for="is_visible" class="inline-flex items-center">
-                                    <input type="checkbox" name="is_visible" id="is_visible" {{ old('is_visible') ? 'checked' : '' }}
-                                           class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50">
-                                    <span class="ml-2 text-sm text-gray-600">Visible to Users</span>
-                                </label>
                             </div>
                         </div>
 
@@ -295,7 +111,7 @@
                                 Reset Form
                             </button>
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                Add Property
+                                Add Tenant
                             </button>
                         </div>
                     </form>

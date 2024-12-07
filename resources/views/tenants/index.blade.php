@@ -2,14 +2,14 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Properties') }}
+                {{ __('Tenants') }}
             </h2>
-            @can('create property')
-    <a href="{{ route('properties.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded inline-flex items-center">
+            @can('create tenants')
+    <a href="{{ route('tenants.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded inline-flex items-center">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
         </svg>
-        Add Property
+        Add Tenant
     </a>
 @endcan
         </div>
@@ -24,52 +24,42 @@
                             <thead class="bg-gray-100">
                                 <tr class="text-left text-gray-600 text-sm font-medium">
                                     <th class="py-2 px-4 border-b">#</th>
-                                    <th class="py-2 px-4 border-b">Name</th>
-                                    <th class="py-2 px-4 border-b">Class</th>
-                                    <th class="py-2 px-4 border-b">Type</th>
-                                    <th class="py-2 px-4 border-b">Community</th>
-                                    <th class="py-2 px-4 border-b">Owner</th>
-                                    <th class="py-2 px-4 border-b">Purchase Value</th>
-                                    <th class="py-2 px-4 border-b">Sales Deed</th>
+                                    <th class="py-2 px-4 border-b">First Name</th>
+                                    <th class="py-2 px-4 border-b">Emirates ID</th>
+                                    <th class="py-2 px-4 border-b">Nationality</th>
+                                    <th class="py-2 px-4 border-b">Email</th>
+                                    <th class="py-2 px-4 border-b">Mobile</th>
+                                    <th class="py-2 px-4 border-b">Visa</th>
+                                    <th class="py-2 px-4 border-b">Passport No</th>
                                     <th class="py-2 px-4 border-b text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($properties as $property)
+                                @foreach($tenants as $tenant)
                                     <tr class="text-gray-700 text-sm hover:bg-gray-50">
                                         <td class="py-2 px-4 border-b">{{ $loop->iteration }}</td>
-                                        <td class="py-2 px-4 border-b">{{ $property->name }}</td>
-                                        <td class="py-2 px-4 border-b">{{ $property->class }}</td>
-                                        <td class="py-2 px-4 border-b">{{ $property->type }}</td>
-                                        <td class="py-2 px-4 border-b">{{ $property->community }}</td>
-                                        <td class="py-2 px-4 border-b">{{ $property->owner->name }}</td>
-                                        <td class="py-2 px-4 border-b">{{ number_format($property->purchase_value, 0) }}</td>
-                                        <td class="py-2 px-4 border-b">
-    @if($property->getFirstMedia('salesdeed'))
-        <a href="{{ route('properties.downloadSalesDeed', $property->id) }}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            Download
-        </a>
-    @else
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-            Not Available
-        </span>
-    @endif
-</td>
+                                        <td class="py-2 px-4 border-b">{{ $tenant->fname }}</td>
+                                        <td class="py-2 px-4 border-b">{{ $tenant->eid }}</td>
+                                        <td class="py-2 px-4 border-b">{{ $tenant->nationality }}</td>
+                                        <td class="py-2 px-4 border-b">{{ $tenant->email }}</td>
+                                        <td class="py-2 px-4 border-b">{{ $tenant->mobile }}</td>
+                                        <td class="py-2 px-4 border-b">{{ $tenant->visa }}</td>
+                                        <td class="py-2 px-4 border-b">{{ $tenant->passportno }}</td>
                                         <td class="py-2 px-4 border-b text-right space-x-2">
                                             <!-- Trigger Modal -->
-                                            @can('view property')
+                                            @can('view tenant')
                                             <a href="javascript:void(0);"
                                                class="text-blue-500 hover:underline"
                                                data-modal-toggle="viewPropertyModal"
-                                               onclick="loadModalContent('{{ route('properties.show', $property->id) }}')">View</a>
+                                               onclick="loadModalContent('{{ route('tenants.show', $tenant->id) }}')">View</a>
                                             @endcan
 
-                                            @can('edit property')
-                                            <a href="{{ route('properties.edit', $property->id) }}"
+                                            @can('edit tenant')
+                                            <a href="{{ route('tenants.edit', $tenant->id) }}"
                                                class="text-yellow-500 hover:underline">Edit</a>
                                             @endcan
-                                            @can('delete property')
-                                            <form action="{{ route('properties.destroy', $property->id) }}" method="POST" class="inline-block">
+                                            @can('delete tenant')
+                                            <form action="{{ route('tenants.destroy', $tenant->id) }}" method="POST" class="inline-block">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-500 hover:underline"
@@ -81,10 +71,10 @@
                                         </td>
                                     </tr>
                                 @endforeach
-                                @if($properties->isEmpty())
+                                @if($tenants->isEmpty())
                                     <tr>
                                         <td colspan="8" class="py-4 text-center text-gray-500">
-                                            No properties found.
+                                            No Tenants found.
                                         </td>
                                     </tr>
                                 @endif
@@ -93,7 +83,7 @@
                     </div>
 
                     <div class="mt-4">
-                        {{ $properties->links() }}
+                        {{ $tenants->links() }}
                     </div>
                 </div>
             </div>
