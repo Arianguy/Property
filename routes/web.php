@@ -90,19 +90,19 @@ Route::middleware(['auth'])->group(function () {
             ->middleware('permission:create tenants')
             ->name('store');
 
-        Route::get('/{property}', [TenantController::class, 'show'])
+        Route::get('/{tenant}', [TenantController::class, 'show'])
             ->middleware('permission:view tenants')
             ->name('show');
 
-        Route::get('/{property}/edit', [TenantController::class, 'edit'])
+        Route::get('/{tenant}/edit', [TenantController::class, 'edit'])
             ->middleware('permission:edit tenants')
             ->name('edit');
 
-        Route::put('/{property}', [TenantController::class, 'update'])
+        Route::put('/{tenant}', [TenantController::class, 'update'])
             ->middleware('permission:edit tenants')
             ->name('update');
 
-        Route::delete('/{property}', [TenantController::class, 'destroy'])
+        Route::delete('/{tenant}', [TenantController::class, 'destroy'])
             ->middleware('permission:delete tenants')
             ->name('destroy');
 

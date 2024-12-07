@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Log;
 use App\Models\Owner;
 use App\Models\Property;
 use Illuminate\Http\Request;
@@ -111,12 +112,13 @@ class PropertyController extends Controller
     public function update(Request $request, $id)
     {
         // Validate the incoming request data
+        Log::info($request->all());
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'class' => 'required|string',
             'type' => 'required|string',
             'purchase_date' => 'required|date',
-            'title_deed_no' => 'required|string|unique:properties,title_deed_no,' . $id,
+            'title_deed_no' => "required|string|unique:properties,title_deed_no,{$id}",
             'mortgage_status' => 'required|string',
             'community' => 'required|string',
             'plot_no' => 'required|numeric',
@@ -133,7 +135,7 @@ class PropertyController extends Controller
             'purchase_value' => 'required|numeric',
             'status' => 'required|string',
             'dewa_premise_no' => 'nullable|numeric',
-            'dewa_account_no' => 'nullable|numeric',
+            'dewa_account_no' => 'required|numeric',
             'salesdeed' => 'nullable|mimes:pdf|max:10240', // 10MB max
             'is_visible' => 'boolean'
         ]);

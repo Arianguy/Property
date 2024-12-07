@@ -5,13 +5,13 @@
                 {{ __('Tenants') }}
             </h2>
             @can('create tenants')
-    <a href="{{ route('tenants.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded inline-flex items-center">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-        </svg>
-        Add Tenant
-    </a>
-@endcan
+            <a href="{{ route('tenants.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded inline-flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Add Tenant
+            </a>
+            @endcan
         </div>
     </x-slot>
 
@@ -47,23 +47,23 @@
                                         <td class="py-2 px-4 border-b">{{ $tenant->passportno }}</td>
                                         <td class="py-2 px-4 border-b text-right space-x-2">
                                             <!-- Trigger Modal -->
-                                            @can('view tenant')
+                                            @can('view tenants')
                                             <a href="javascript:void(0);"
                                                class="text-blue-500 hover:underline"
-                                               data-modal-toggle="viewPropertyModal"
+                                               id="openModal"
                                                onclick="loadModalContent('{{ route('tenants.show', $tenant->id) }}')">View</a>
                                             @endcan
 
-                                            @can('edit tenant')
+                                            @can('edit tenants')
                                             <a href="{{ route('tenants.edit', $tenant->id) }}"
                                                class="text-yellow-500 hover:underline">Edit</a>
                                             @endcan
-                                            @can('delete tenant')
-                                            <form action="{{ route('tenants.destroy', $tenant->id) }}" method="POST" class="inline-block">
+
+                                            @can('delete tenants')
+                                            <form action="{{ route('tenants.destroy', $tenant->id) }}" method="POST" class="inline-block" id="deleteForm-{{ $tenant->id }}">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-500 hover:underline"
-                                                        onclick="return confirm('Are you sure you want to delete this property?')">
+                                                <button type="button" class="text-red-500 hover:underline" onclick="openDeleteModal('{{ $tenant->id }}')">
                                                     Delete
                                                 </button>
                                             </form>
@@ -90,79 +90,114 @@
         </div>
     </div>
 
-
-<!-- Flowbite Modal -->
-<div id="viewPropertyModal" tabindex="-1" aria-hidden="true" class="hidden fixed inset-0 z-50 overflow-y-auto" data-modal-target="viewPropertyModal">
-    <div class="flex items-center justify-center min-h-screen px-4 text-center">
-        <div class="fixed inset-0 transition-opacity bg-gray-200 opacity-100"></div> <!-- Grey Transparent Backdrop -->
-        <div class="relative w-full max-w-4xl p-4 mx-auto bg-white rounded-lg shadow-lg">
-            <!-- Modal content -->
-            <div class="flex items-start justify-between p-2 border-b rounded-t">
-                <h3 class="text-xl font-semibold text-gray-600">
-                    Property Details
-                </h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" data-modal-toggle="viewPropertyModal">
-                    <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" d="M10 9a1 1 0 011 1v3a1 1 0 01-2 0V10a1 1 0 011-1z" clip-rule="evenodd"></path>
-                        <path d="M4 10a6 6 0 1112 0 6 6 0 01-12 0z"></path>
-                    </svg>
-                    <span class="sr-only">Close modal</span>
-                </button>
-            </div>
-            <!-- Modal body -->
-            <div id="modalContent" class="p-4 space-y-3">
+    <!-- Simple Modal -->
+    <div id="myModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" style="cursor: pointer;">&times;</span>
+            <h2>Tenant Details</h2>
+            <div id="modalContent">
                 <!-- Content will be loaded dynamically -->
             </div>
-            <!-- Modal footer -->
-            <div class="flex justify-end p-4 border-t">
-                <button type="button" class="text-white bg-red-500 hover:bg-red-600 rounded-lg text-sm px-4 py-2 font-medium" data-modal-toggle="viewPropertyModal">
-                    Close
-                </button>
-            </div>
+            <button id="closeModal" style="padding: 10px 20px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>
         </div>
     </div>
-</div>
 
+    <style>
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+            justify-content: center; /* Center modal horizontally */
+            align-items: center; /* Center modal vertically */
+            display: flex; /* Use flex to center */
+        }
+        .modal-content {
+            background-color: #fff; /* White background */
+            margin: auto; /* Center the modal */
+            padding: 20px; /* Some padding */
+            border: 1px solid #888; /* Gray border */
+            width: 80%; /* Could be more or less, depending on screen size */
+            max-width: 500px; /* Max width */
+            border-radius: 8px; /* Rounded corners */
+        }
+        .close {
+            color: #aaa; /* Gray color */
+            float: right; /* Float to the right */
+            font-size: 28px; /* Large font size */
+            font-weight: bold; /* Bold text */
+        }
+        .close:hover,
+        .close:focus {
+            color: black; /* Change color on hover */
+            text-decoration: none; /* No underline */
+            cursor: pointer; /* Pointer cursor */
+        }
+    </style>
 
-<script>
-    function loadModalContent(url) {
-        const modalContent = document.getElementById('modalContent');
-        modalContent.innerHTML = '<div class="text-center">Loading...</div>'; // Show loading message
-        fetch(url)
-            .then(response => response.text())
-            .then(html => {
-                modalContent.innerHTML = html;
-            })
-            .catch(error => {
-                console.error('Error loading content:', error);
-                modalContent.innerHTML = '<div class="text-red-500">Failed to load content.</div>';
-            });
-    }
+    <script>
+        // Get the modal
+        var modal = document.getElementById("myModal");
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const modal = document.getElementById('viewPropertyModal');
-        const modalToggle = document.querySelector('[data-modal-toggle="viewPropertyModal"]');
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
 
-        // Function to toggle modal visibility
-        function toggleModal() {
-            modal.classList.toggle('hidden');
-            modal.classList.toggle('flex');
+        // Get the close button
+        document.getElementById("closeModal").onclick = function() {
+            modal.style.display = "none";
         }
 
-        if (modalToggle) {
-            modalToggle.addEventListener('click', toggleModal);
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+            modal.style.display = "none";
         }
 
-        // Close modal when clicking outside of the modal content
-        modal.addEventListener('click', function (event) {
-            if (event.target === modal) {
-                toggleModal();
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
             }
+        }
+
+        function loadModalContent(url) {
+            console.log("Loading URL:", url); // Log the URL
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = '<div class="text-center">Loading...</div>'; // Show loading message
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    modalContent.innerHTML = html;
+                    modal.style.display = "flex"; // Show the modal
+                })
+                .catch(error => {
+                    console.error('Error loading content:', error);
+                    modalContent.innerHTML = '<div class="text-red-500">Failed to load content.</div>';
+                });
+        }
+
+        // Open modal when the "View" link is clicked
+        document.querySelectorAll('[id="openModal"]').forEach(button => {
+            button.addEventListener('click', function() {
+                modal.style.display = "flex"; // Show the modal
+            });
         });
-    });
+
+        function openDeleteModal(tenantId) {
+            const confirmation = confirm("Are you sure you want to delete this tenant?");
+            if (confirmation) {
+                document.getElementById('deleteForm-' + tenantId).submit(); // Submit the form to delete
+            }
+        }
     </script>
-
-
-
 
 </x-app-layout>

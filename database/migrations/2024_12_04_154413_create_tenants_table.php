@@ -22,11 +22,6 @@ return new class extends Migration
             $table->string('visa');
             $table->string('passportno');
             $table->date('passexp');
-            $table->string('eidfront');
-            $table->string('eidback');
-            $table->string('frontpass');
-            $table->string('backpass');
-            $table->string('visa_img');
             $table->timestamps();
         });
     }

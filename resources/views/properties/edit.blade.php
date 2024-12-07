@@ -267,7 +267,7 @@
 
                                         <div>
                                             <label for="dewa_account_no" class="block text-sm font-medium text-gray-700">DEWA Account No.</label>
-                                            <input type="number" name="dewa_account_no" id="dewa_account_no" value="{{ old('dewa_account_no', $property->dewa_account_no) }}"
+                                            <input type="number" name="dewa_account_no" id="dewa_account_no" value="{{ old('dewa_account_no', $property->dewa_account_no) }}" required
                                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                             @error('dewa_account_no')
                                                 <span class="text-red-500 text-sm">{{ $message }}</span>

@@ -43,7 +43,7 @@ class Property extends Model implements HasMedia
         'owner_id',
         'purchase_value',
         'dewa_premise_no',
-        'dewa_ac_no',
+        'dewa_account_no',
         'status',
         'salesdeed',
         'is_visible'

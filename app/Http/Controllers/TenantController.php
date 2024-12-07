@@ -14,18 +14,12 @@ class TenantController extends Controller
         return view('tenants.index', compact('tenants'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         // Show the form for creating a new tenant
         return view('tenants.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         // Validate the request data with custom messages
@@ -34,15 +28,17 @@ class TenantController extends Controller
             'eid' => 'required|numeric|digits:15|unique:tenants,eid', // Ensure it's exactly 15 digits
             'nationality' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'mobile' => 'required||numeric|digits:10',
+            'mobile' => 'required|string|digits:10',
             'visa' => 'required|string|max:255',
             'passportno' => 'required|string|max:255',
         ], [
             'eid.required' => 'The Emirates ID is required.',
             'eid.numeric' => 'The Emirates ID must be a number.',
-            'eid.digits' => 'The Emirates ID must be exactly 15 digits long.',
+            'eid.digits' => 'The Emirates ID must be exactly 10 digits long.',
             'eid.unique' => 'The Emirates ID has already been taken.',
-            'mobile.digits' => 'The Mobile Number must be exactly 10 digits long.',
+            'mobile.required' => 'The Mobile Number is required.',
+            'mobile.string' => 'The Mobile Number must be a string.',
+            'mobile.digits_between' => 'The Mobile Number must be between 10 and 15 digits long.',
             // Add custom messages for other fields as needed
         ]);
 
@@ -58,11 +54,11 @@ class TenantController extends Controller
         } catch (\Illuminate\Database\QueryException $e) {
             // Handle the unique constraint violation
             if ($e->getCode() === '23000') {
-                return redirect()->back()->withErrors(['eid' => 'The Emirates ID has already been taken.']);
+                return redirect()->back()->withInput()->withErrors(['eid' => 'The Emirates ID has already been taken.']);
             }
 
             // Handle other database exceptions
-            return redirect()->back()->withErrors(['error' => 'An error occurred while creating the tenant.']);
+            return redirect()->back()->withInput()->withErrors(['error' => 'An error occurred while creating the tenant.']);
         }
     }
 
@@ -93,17 +89,16 @@ class TenantController extends Controller
     }
 
 
-    public function show(Tenant $tenant)
+    public function show($id)
     {
-        //
+        $tenant = Tenant::findOrFail($id); // Fetch the tenant by ID
+        return view('tenants.show', compact('tenant')); // Return the view with tenant data
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Tenant $tenant)
     {
-        //
+        // Fetch the tenant data and return the edit view
+        return view('tenants.edit', compact('tenant'));
     }
 
     /**
@@ -111,7 +106,41 @@ class TenantController extends Controller
      */
     public function update(Request $request, Tenant $tenant)
     {
-        //
+        // Prepare validation rules
+        $rules = [
+            'fname' => 'required|string|max:255',
+            'eid' => 'required|string|size:18|regex:/^\d{3}-\d{4}-\d{7}-\d{1}$/', // Ensure it's in the correct format
+            'nationality' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'mobile' => 'required|numeric|digits:10',
+            'visa' => 'required|string|max:255',
+            'passportno' => 'required|string|max:255',
+        ];
+
+        // Add unique validation only if the eid has changed
+        if ($request->eid !== $tenant->eid) {
+            $rules['eid'] .= '|unique:tenants,eid';
+        }
+
+        // Validate the request data with custom messages
+        $request->validate($rules, [
+            'eid.required' => 'The Emirates ID is required.',
+            'eid.string' => 'The Emirates ID must be a string.',
+            'eid.size' => 'The Emirates ID must be exactly 18 characters long.',
+            'eid.regex' => 'The Emirates ID must be numbers in the format xxx-xxxx-xxxxxxx-x.',
+            'eid.unique' => 'The Emirates ID has already been taken.',
+            'mobile.digits' => 'The Mobile Number must be exactly 10 digits long.',
+            // Add custom messages for other fields as needed
+        ]);
+
+        // Format the Emirates ID
+        $formattedEid = $this->formatEmiratesID($request->eid);
+
+        // Update the tenant with the validated data
+        $tenant->update(array_merge($request->all(), ['eid' => $formattedEid]));
+
+        // Redirect to the tenants index with a success message
+        return redirect()->route('tenants.index')->with('success', 'Tenant updated successfully.');
     }
 
     /**
@@ -119,6 +148,15 @@ class TenantController extends Controller
      */
     public function destroy(Tenant $tenant)
     {
-        //
+        try {
+            // Delete the tenant
+            $tenant->delete();
+
+            // Redirect to the tenants index with a success message
+            return redirect()->route('tenants.index')->with('success', 'Tenant deleted successfully.');
+        } catch (\Exception $e) {
+            // Handle any errors that may occur during deletion
+            return redirect()->back()->withErrors(['error' => 'An error occurred while deleting the tenant.']);
+        }
     }
 }
