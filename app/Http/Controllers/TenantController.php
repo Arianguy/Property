@@ -65,9 +65,9 @@ class TenantController extends Controller
     private function formatEmiratesID($eid)
     {
         // Log the raw eid value received
-        \Log::info('Raw Emirates ID received for formatting: ' . $eid);
+        'Log'::info('Raw Emirates ID received for formatting: ' . $eid);
 
-        \Log::info('Cleaned Emirates ID: ' . $eid);
+        'Log'::info('Cleaned Emirates ID: ' . $eid);
 
         // Check the length of the cleaned ID
         $length = strlen($eid);
@@ -82,7 +82,7 @@ class TenantController extends Controller
         }
 
         // Log a warning if the length is incorrect
-        \Log::warning('Emirates ID length is not 15 digits: ' . $eid);
+        'Log'::warning('Emirates ID length is not 15 digits: ' . $eid);
 
         // Return the original ID if it doesn't match the expected lengths
         return $eid;

@@ -112,7 +112,7 @@ class PropertyController extends Controller
     public function update(Request $request, $id)
     {
         // Validate the incoming request data
-        Log::info($request->all());
+        'Log'::info($request->all());
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'class' => 'required|string',
