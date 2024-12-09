@@ -14,10 +14,9 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
-                    <form method="POST" action="{{ route('tenants.update', $tenant->id) }}" class="space-y-6">
+                    <form action="{{ route('tenants.update', $tenant->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        @method('PUT') <!-- Added method to indicate update -->
-
+                        @method('PUT')
                         <!-- Tenant Information -->
                         <div class="bg-gray-50 p-4 rounded-lg space-y-4">
                             <h3 class="text-lg font-medium text-gray-900">Tenant Information</h3>
@@ -105,7 +104,7 @@
 
                                 <div>
                                     <label for="emirates_id" class="block text-sm font-medium text-gray-700">Attach Emirates ID</label>
-                                    <input type="file" name=emirates_id[]" id="emirates_id" multiple class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <input type="file" name="emirates_id[]" multiple class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     @error('emirates_id')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror

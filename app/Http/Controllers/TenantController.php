@@ -31,15 +31,16 @@ class TenantController extends Controller
             'mobile' => 'required|string|digits:10',
             'visa' => 'required|string|max:255',
             'passportno' => 'required|string|max:255',
+            'emirates_id.*' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048', // Validate each file as required
         ], [
             'eid.required' => 'The Emirates ID is required.',
             'eid.numeric' => 'The Emirates ID must be a number.',
-            'eid.digits' => 'The Emirates ID must be exactly 10 digits long.',
+            'eid.digits' => 'The Emirates ID must be exactly 15 digits long.',
             'eid.unique' => 'The Emirates ID has already been taken.',
             'mobile.required' => 'The Mobile Number is required.',
             'mobile.string' => 'The Mobile Number must be a string.',
-            'mobile.digits_between' => 'The Mobile Number must be between 10 and 15 digits long.',
-            // Add custom messages for other fields as needed
+            'mobile.digits' => 'The Mobile Number must be exactly 10 digits long.',
+            'emirates_id.*.required' => 'Each Emirates ID file is required.', // Custom message for file requirement
         ]);
 
         // Format the Emirates ID
@@ -48,6 +49,18 @@ class TenantController extends Controller
         try {
             // Create a new tenant with the formatted Emirates ID
             $tenant = Tenant::create(array_merge($request->all(), ['eid' => $formattedEid]));
+
+            // Handle the file uploads
+            if ($request->hasFile('emirates_id')) {
+                // Upload new files
+                foreach ($request->file('emirates_id') as $file) {
+                    Log::info('Uploading file: ' . $file->getClientOriginalName());
+                    $tenant->addMedia($file)->toMediaCollection('emirates_ids'); // Save each file to the media collection
+                    Log::info('File uploaded successfully: ' . $file->getClientOriginalName());
+                }
+            } else {
+                Log::warning('No files uploaded for Emirates ID.');
+            }
 
             // Redirect to the tenants index with a success message
             return redirect()->route('tenants.index')->with('success', 'Tenant created successfully.');
@@ -106,6 +119,10 @@ class TenantController extends Controller
      */
     public function update(Request $request, Tenant $tenant)
     {
+        // Log the incoming request data
+        Log::info('Update method called for tenant ID: ' . $tenant->id);
+        Log::info('Request data: ', $request->all());
+
         // Prepare validation rules
         $rules = [
             'fname' => 'required|string|max:255',
@@ -115,6 +132,7 @@ class TenantController extends Controller
             'mobile' => 'required|numeric|digits:10',
             'visa' => 'required|string|max:255',
             'passportno' => 'required|string|max:255',
+            'emirates_id.*' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048', // Validate each file as required
         ];
 
         // Add unique validation only if the eid has changed
@@ -130,7 +148,7 @@ class TenantController extends Controller
             'eid.regex' => 'The Emirates ID must be numbers in the format xxx-xxxx-xxxxxxx-x.',
             'eid.unique' => 'The Emirates ID has already been taken.',
             'mobile.digits' => 'The Mobile Number must be exactly 10 digits long.',
-            // Add custom messages for other fields as needed
+            'emirates_id.*.required' => 'Each Emirates ID file is required.', // Custom message for file requirement
         ]);
 
         // Format the Emirates ID
@@ -138,6 +156,24 @@ class TenantController extends Controller
 
         // Update the tenant with the validated data
         $tenant->update(array_merge($request->all(), ['eid' => $formattedEid]));
+
+        // Handle the file uploads
+        if ($request->hasFile('emirates_id')) {
+            // Check if there are existing files and remove them
+            if ($tenant->getMedia('emirates_ids')->isNotEmpty()) {
+                Log::info('Removing existing Emirates ID files for tenant ID: ' . $tenant->id);
+                $tenant->clearMediaCollection('emirates_ids'); // Remove existing files
+            }
+
+            // Upload new files
+            foreach ($request->file('emirates_id') as $file) {
+                Log::info('Uploading file: ' . $file->getClientOriginalName());
+                $tenant->addMedia($file)->toMediaCollection('emirates_ids'); // Save each file to the media collection
+                Log::info('File uploaded successfully: ' . $file->getClientOriginalName());
+            }
+        } else {
+            Log::warning('No files uploaded for Emirates ID.');
+        }
 
         // Redirect to the tenants index with a success message
         return redirect()->route('tenants.index')->with('success', 'Tenant updated successfully.');
