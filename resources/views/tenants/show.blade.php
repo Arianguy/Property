@@ -146,7 +146,7 @@
                                             class="bg-white text-gray-800 px-3 py-1 rounded-md text-sm hover:bg-gray-100 transition-colors duration-200">
                                              View
                                          </a>
-                                        <a href="{{ route('tenants.documents.download', ['tenant' => $tenant->id, 'media' => $media->id, 'type' => 'visa']) }}"
+                                        <a href="{{ route('tenants.documents.download', ['tenant' => $tenant->id, 'media' => $media->id, 'type' => 'visa_copies']) }}"
                                             class="bg-blue-500 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600 transition-colors duration-200">
                                              Download
                                          </a>
