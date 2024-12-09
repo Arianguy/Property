@@ -111,6 +111,22 @@
                                     @enderror
                                 </div>
 
+                                <div>
+                                    <label for="passport_copy" class="block text-sm font-medium text-gray-700">Attach Passport Copy</label>
+                                    <input type="file" name="passport_copy[]" multiple class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    @error('passport_copy')
+                                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label for="visa_copy" class="block text-sm font-medium text-gray-700">Attach Visa Copy</label>
+                                    <input type="file" name="visa_copy[]" multiple class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    @error('visa_copy')
+                                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
                             </div>
                         </div>
 

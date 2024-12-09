@@ -31,8 +31,10 @@ class TenantController extends Controller
             'mobile' => 'required|string|digits:10',
             'visa' => 'required|string|max:255',
             'passportno' => 'required|string|max:255',
-            'emirates_id.*' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048', // Validate each file as required
-        ], [
+            'emirates_id.*' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max
+            'passport_copy.*' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'visa_copy.*' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        ], [], [
             'eid.required' => 'The Emirates ID is required.',
             'eid.numeric' => 'The Emirates ID must be a number.',
             'eid.digits' => 'The Emirates ID must be exactly 15 digits long.',
@@ -41,6 +43,8 @@ class TenantController extends Controller
             'mobile.string' => 'The Mobile Number must be a string.',
             'mobile.digits' => 'The Mobile Number must be exactly 10 digits long.',
             'emirates_id.*.required' => 'Each Emirates ID file is required.', // Custom message for file requirement
+            'passport_copy.*.required' => 'Each Passport copy file is required.',
+            'visa_copy.*.required' => 'Each Visa copy file is required.',
         ]);
 
         // Format the Emirates ID
@@ -51,15 +55,29 @@ class TenantController extends Controller
             $tenant = Tenant::create(array_merge($request->all(), ['eid' => $formattedEid]));
 
             // Handle the file uploads
+            // Handle multiple file uploads for emirates_id
             if ($request->hasFile('emirates_id')) {
-                // Upload new files
                 foreach ($request->file('emirates_id') as $file) {
-                    Log::info('Uploading file: ' . $file->getClientOriginalName());
-                    $tenant->addMedia($file)->toMediaCollection('emirates_ids'); // Save each file to the media collection
+                    $tenant->addMedia($file)
+                        ->toMediaCollection('emirates_ids');
                     Log::info('File uploaded successfully: ' . $file->getClientOriginalName());
                 }
             } else {
                 Log::warning('No files uploaded for Emirates ID.');
+            }
+
+            // Handle Passport copy files
+            if ($request->hasFile('passport_copy')) {
+                foreach ($request->file('passport_copy') as $file) {
+                    $tenant->addMedia($file)->toMediaCollection('passport_copies');
+                }
+            }
+
+            // Handle Visa copy files
+            if ($request->hasFile('visa_copy')) {
+                foreach ($request->file('visa_copy') as $file) {
+                    $tenant->addMedia($file)->toMediaCollection('visa_copies');
+                }
             }
 
             // Redirect to the tenants index with a success message
@@ -101,6 +119,42 @@ class TenantController extends Controller
         return $eid;
     }
 
+    public function viewDocument($tenantId, $mediaId, $type)
+    {
+        $tenant = Tenant::findOrFail($tenantId);
+
+        if (!auth()->user()->can('view tenants')) {
+            abort(403);
+        }
+
+        $collectionName = $this->getCollectionName($type);
+        $media = $tenant->getMedia($collectionName)->where('id', $mediaId)->firstOrFail();
+
+        return response()->file($media->getPath());
+    }
+
+    public function downloadDocument($tenantId, $mediaId, $type)
+    {
+        $tenant = Tenant::findOrFail($tenantId);
+
+        if (!auth()->user()->can('view tenants')) {
+            abort(403);
+        }
+
+        $collectionName = $this->getCollectionName($type);
+        $media = $tenant->getMedia($collectionName)->where('id', $mediaId)->firstOrFail();
+
+        return response()->download($media->getPath(), $media->file_name);
+    }
+
+    private function getCollectionName($type)
+    {
+        return match ($type) {
+            'passport' => 'passport_copies',
+            'visa' => 'visa_copies',
+            default => 'emirates_ids',
+        };
+    }
 
     public function show($id)
     {

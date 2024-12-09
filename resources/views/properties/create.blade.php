@@ -283,7 +283,7 @@
 
                             <div class="mt-4">
                                 <label for="is_visible" class="inline-flex items-center">
-                                    <input type="checkbox" name="is_visible" id="is_visible" {{ old('is_visible') ? 'checked' : '' }}
+                                    <input type="checkbox" name="is_visible" id="is_visible" {{ old('is_visible', true) ? 'checked' : '' }}
                                            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50">
                                     <span class="ml-2 text-sm text-gray-600">Visible to Users</span>
                                 </label>
