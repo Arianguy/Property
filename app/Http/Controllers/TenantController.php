@@ -136,13 +136,11 @@ class TenantController extends Controller
     public function downloadDocument($tenantId, $mediaId, $type)
     {
         $tenant = Tenant::findOrFail($tenantId);
+        $media = $tenant->getMedia($type)->where('id', $mediaId)->first();
 
-        if (!auth()->user()->can('view tenants')) {
-            abort(403);
+        if (!$media) {
+            abort(404, 'Media item not found');
         }
-
-        $collectionName = $this->getCollectionName($type);
-        $media = $tenant->getMedia($collectionName)->where('id', $mediaId)->firstOrFail();
 
         return response()->download($media->getPath(), $media->file_name);
     }
@@ -211,23 +209,58 @@ class TenantController extends Controller
         // Update the tenant with the validated data
         $tenant->update(array_merge($request->all(), ['eid' => $formattedEid]));
 
-        // Handle the file uploads
+        // Handle Emirates ID files
         if ($request->hasFile('emirates_id')) {
-            // Check if there are existing files and remove them
-            if ($tenant->getMedia('emirates_ids')->isNotEmpty()) {
-                Log::info('Removing existing Emirates ID files for tenant ID: ' . $tenant->id);
-                $tenant->clearMediaCollection('emirates_ids'); // Remove existing files
-            }
+            // Clear existing emirates_ids media collection
+            $tenant->clearMediaCollection('emirates_ids');
 
-            // Upload new files
             foreach ($request->file('emirates_id') as $file) {
-                Log::info('Uploading file: ' . $file->getClientOriginalName());
-                $tenant->addMedia($file)->toMediaCollection('emirates_ids'); // Save each file to the media collection
-                Log::info('File uploaded successfully: ' . $file->getClientOriginalName());
+                if ($file->isValid()) {
+                    $tenant->addMedia($file)
+                        ->toMediaCollection('emirates_ids');
+                    Log::info('File uploaded successfully: ' . $file->getClientOriginalName());
+                }
             }
         } else {
             Log::warning('No files uploaded for Emirates ID.');
         }
+
+        // Handle Passport copy files
+        if ($request->hasFile('passport_copy')) {
+            // Clear existing passport_copies media collection
+            $tenant->clearMediaCollection('passport_copies');
+
+            foreach ($request->file('passport_copy') as $file) {
+                if ($file->isValid()) {
+                    $tenant->addMedia($file)
+                        ->sanitizingFileName(function ($fileName) {
+                            return str_replace(['#', '/', '\\'], '-', $fileName);
+                        })
+                        ->toMediaCollection('passport_copies');
+                }
+            }
+        } else {
+            Log::warning('No files uploaded for Passport.');
+        }
+
+        // Handle Visa copy files
+        if ($request->hasFile('visa_copy')) {
+            // Clear existing visa_copies media collection
+            $tenant->clearMediaCollection('visa_copies');
+
+            foreach ($request->file('visa_copy') as $file) {
+                if ($file->isValid()) {
+                    $tenant->addMedia($file)
+                        ->sanitizingFileName(function ($fileName) {
+                            return str_replace(['#', '/', '\\'], '-', $fileName);
+                        })
+                        ->toMediaCollection('visa_copies');
+                }
+            }
+        } else {
+            Log::warning('No files uploaded for Visa.');
+        }
+
 
         // Redirect to the tenants index with a success message
         return redirect()->route('tenants.index')->with('success', 'Tenant updated successfully.');

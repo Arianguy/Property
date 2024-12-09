@@ -94,9 +94,9 @@ Route::middleware(['auth'])->group(function () {
             ->middleware('permission:view tenants')
             ->name('show');
 
-        Route::get('/{tenant}/documents/{media}/view', [TenantController::class, 'viewDocument'])
+        Route::get('/{tenant}/documents/{media}/{type}', [TenantController::class, 'viewDocument'])
             ->name('documents.view');
-        Route::get('/{tenant}/documents/{media}/download', [TenantController::class, 'downloadDocument'])
+        Route::get('/{tenant}/documents/download/{media}/{type}', [TenantController::class, 'downloadDocument'])
             ->name('documents.download');
 
         Route::get('/{tenant}/edit', [TenantController::class, 'edit'])
