@@ -22,7 +22,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-
+// User Management Routes
 Route::middleware(['auth', 'role:Super Admin'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         // User Management
@@ -120,5 +120,7 @@ Route::middleware(['auth'])->group(function () {
         //     ->middleware('auth');
     });
 });
+
+
 
 require __DIR__ . '/auth.php';

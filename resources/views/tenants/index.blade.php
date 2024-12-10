@@ -94,7 +94,7 @@
     <div id="myModal" class="modal" style="display: none;">
         <div class="modal-content">
             <span class="close" style="cursor: pointer;">&times;</span>
-            <h2>Tenant Details</h2>
+            {{-- <h2>Tenant Details</h2> --}}
             <div id="modalContent">
                 <!-- Content will be loaded dynamically -->
             </div>

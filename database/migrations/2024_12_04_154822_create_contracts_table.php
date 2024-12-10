@@ -26,7 +26,6 @@ return new class extends Migration
             $table->decimal('sec_amt', 10, 2);
             $table->string('ejari');
             $table->string('validity');
-            $table->string('contract_img');
             $table->timestamps();
         });
     }

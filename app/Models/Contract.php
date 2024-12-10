@@ -24,7 +24,6 @@ class Contract extends Model implements HasMedia
         'sec_amt',
         'ejari',
         'validity',
-        'contract_img'
     ];
 
     public function tenant(): BelongsTo
