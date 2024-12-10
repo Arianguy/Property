@@ -123,7 +123,7 @@
             padding: 20px; /* Some padding */
             border: 1px solid #888; /* Gray border */
             width: 80%; /* Could be more or less, depending on screen size */
-            max-width: 500px; /* Max width */
+            max-width: 700px; /* Max width */
             border-radius: 8px; /* Rounded corners */
         }
         .close {

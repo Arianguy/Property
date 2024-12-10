@@ -21,12 +21,7 @@ class Tenant extends Model implements HasMedia
         'mobile',
         'visa',
         'passportno',
-        'passexp',
-        'eidfront',
-        'eidback',
-        'frontpass',
-        'backpass',
-        'visa_img'
+        'passexp'
     ];
 
     public function contracts()

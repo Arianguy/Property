@@ -31,6 +31,8 @@ class TenantController extends Controller
             'mobile' => 'required|string|digits:10',
             'visa' => 'required|string|max:255',
             'passportno' => 'required|string|max:255',
+            'passexp' => 'required|date|max:255',
+            'eidexp' => 'required|date|max:255',
             'emirates_id.*' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max
             'passport_copy.*' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
             'visa_copy.*' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
