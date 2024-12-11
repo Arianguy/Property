@@ -19,10 +19,21 @@
                         <!-- Contract Information -->
                         <div class="bg-gray-50 p-4 rounded-lg space-y-4">
                             <h3 class="text-lg font-medium text-gray-900">Contract Information</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <!-- Contract Name -->
+                                <div>
+                                    <label for="name" class="block text-sm font-medium text-gray-700">Contract Name</label>
+                                    <input type="text" name="name" id="name" value="{{ old('name', $randomName ?? '') }}" readonly
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-300 focus:ring-gray-300 bg-gray-200">
+                                    @error('name')
+                                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
                                 <!-- Tenant Selection -->
                                 <div>
                                     <label for="tenant_id" class="block text-sm font-medium text-gray-700">Tenant</label>
+                                    <div class="flex items-center">
                                     <select name="tenant_id" id="tenant_id" required
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                         <option value="">Select Tenant</option>
@@ -32,9 +43,13 @@
                                             </option>
                                         @endforeach
                                     </select>
+                                    <a href="{{ route('tenants.create') }}" class="mt-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-2">
+                                        +
+                                    </a>
                                     @error('tenant_id')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
+                                    </div>
                                 </div>
 
                                 <!-- Property Selection -->
@@ -44,9 +59,11 @@
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                         <option value="">Select Property</option>
                                         @foreach($properties as $property)
-                                            <option value="{{ $property->id }}" {{ old('property_id') == $property->id ? 'selected' : '' }}>
-                                                {{ $property->name }} ({{ $property->community }})
-                                            </option>
+                                            @if($property->status === 'VACANT')
+                                                <option value="{{ $property->id }}" {{ old('property_id') == $property->id ? 'selected' : '' }}>
+                                                    {{ $property->name }} ({{ $property->community }})
+                                                </option>
+                                            @endif
                                         @endforeach
                                     </select>
                                     @error('property_id')
@@ -54,15 +71,7 @@
                                     @enderror
                                 </div>
 
-                                <!-- Contract Name -->
-                                <div>
-                                    <label for="name" class="block text-sm font-medium text-gray-700">Contract Name</label>
-                                    <input type="text" name="name" id="name" value="{{ old('name') }}" required
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('name')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
+
 
                                 <!-- Start Date -->
                                 <div>
