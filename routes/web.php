@@ -7,6 +7,7 @@ use App\Http\Controllers\TenantController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ContractController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -121,6 +122,37 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
+// Contract Management Routes
+Route::middleware(['auth'])->group(function () {
+    Route::prefix('contracts')->name('contracts.')->group(function () {
+        Route::get('/', [ContractController::class, 'index'])
+            ->middleware('permission:view contracts')
+            ->name('index');
 
+        Route::get('/create', [ContractController::class, 'create'])
+            ->middleware('permission:create contracts')
+            ->name('create');
+
+        Route::post('/', [ContractController::class, 'store'])
+            ->middleware('permission:create contracts')
+            ->name('store');
+
+        Route::get('/{contract}', [ContractController::class, 'show'])
+            ->middleware('permission:view contracts')
+            ->name('show');
+
+        Route::get('/{contract}/edit', [ContractController::class, 'edit'])
+            ->middleware('permission:edit contracts')
+            ->name('edit');
+
+        Route::put('/{contract}', [ContractController::class, 'update'])
+            ->middleware('permission:edit contracts')
+            ->name('update');
+
+        Route::delete('/{contract}', [ContractController::class, 'destroy'])
+            ->middleware('permission:delete contracts')
+            ->name('destroy');
+    });
+});
 
 require __DIR__ . '/auth.php';

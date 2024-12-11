@@ -78,12 +78,12 @@ class PermissionController extends Controller
     public function destroy(Permission $permission)
     {
         try {
-            // Add logging to debug
+            // Log the deletion attempt
             \Log::info('Attempting to delete permission: ' . $permission->id);
 
-            // Check if permission is in use
+            // Check if permission is assigned to any roles
             if ($permission->roles()->count() > 0) {
-                Log::warning('Cannot delete permission - has roles assigned');
+                \Log::warning('Cannot delete permission - has roles assigned');
                 return back()->with('error', 'Cannot delete permission that is assigned to roles');
             }
 

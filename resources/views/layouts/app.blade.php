@@ -16,6 +16,7 @@
         <script src="https://cdn.jsdelivr.net/npm/flowbite@1.4.6/dist/flowbite.min.js"></script>
          <!-- Add Alpine.js -->
          <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+         <script src="//unpkg.com/alpinejs" defer></script>
 
          <!-- Add this style for x-cloak -->
          <style>

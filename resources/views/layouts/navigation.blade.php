@@ -105,11 +105,11 @@ class="bg-white border-gray-200 dark:bg-gray-900">
                 </a>
                 @endcan
 
-                @can('view contract')
-                <a href="{{ route('properties.index') }}"
+                @can('view contracts')
+                <a href="{{ route('contracts.index') }}"
                 class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-between"
                 >
-                    {{ __('Contract') }}
+                    {{ __('Contracts') }}
                 </a>
                 @endcan
 

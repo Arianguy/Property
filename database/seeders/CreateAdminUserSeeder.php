@@ -53,7 +53,9 @@ class CreateAdminUserSeeder extends Seeder
             'create tenants',
             'edit tenants',
             'delete tenants',
-            'manage tenants'  // Overall tenant management
+            'manage tenants',    // Overall tenant management
+
+            // Add other permissions as needed
         ];
 
         // Create permissions
@@ -69,6 +71,8 @@ class CreateAdminUserSeeder extends Seeder
 
         // 2. Owner
         $ownerRole = Role::create(['name' => 'Owner']);
+
+        // Assign existing permissions to roles
         $ownerRole->givePermissionTo([
             'view property',
             'view contract',
