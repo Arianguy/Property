@@ -19,6 +19,11 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
+                    @if(session('success'))
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                            {{ session('success') }}
+                        </div>
+                    @endif
                     <div class="overflow-x-auto">
                         <table class="min-w-full bg-white border border-gray-200 rounded-lg">
                             <thead class="bg-gray-100">
@@ -30,6 +35,7 @@
                                     <th class="py-2 px-4 border-b">Community</th>
                                     <th class="py-2 px-4 border-b">Owner</th>
                                     <th class="py-2 px-4 border-b">Purchase Value</th>
+                                    <th class="py-2 px-4 border-b">Status</th>
                                     <th class="py-2 px-4 border-b">Sales Deed</th>
                                     <th class="py-2 px-4 border-b text-right">Actions</th>
                                 </tr>
@@ -45,16 +51,27 @@
                                         <td class="py-2 px-4 border-b">{{ $property->owner->name }}</td>
                                         <td class="py-2 px-4 border-b">{{ number_format($property->purchase_value, 0) }}</td>
                                         <td class="py-2 px-4 border-b">
-    @if($property->getFirstMedia('salesdeed'))
-        <a href="{{ route('properties.downloadSalesDeed', $property->id) }}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            Download
-        </a>
-    @else
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-            Not Available
-        </span>
-    @endif
-</td>
+                                            @if($property->status === 'LEASED')
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                    {{ $property->status }}
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                    {{ $property->status }}
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td class="py-2 px-4 border-b">
+                                            @if($property->getFirstMedia('salesdeed'))
+                                                <a href="{{ route('properties.downloadSalesDeed', $property->id) }}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                    Download
+                                                </a>
+                                            @else
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                    Not Available
+                                                </span>
+                                            @endif
+                                        </td>
                                         <td class="py-2 px-4 border-b text-right space-x-2">
                                             <!-- Trigger Modal -->
                                             @can('view property')

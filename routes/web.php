@@ -152,6 +152,14 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{contract}', [ContractController::class, 'destroy'])
             ->middleware('permission:delete contracts')
             ->name('destroy');
+
+        // Route for viewing documents
+        Route::get('/{contract}/documents/{media}', [ContractController::class, 'viewDocument'])
+            ->name('documents.view');
+
+        // Route for downloading documents
+        Route::get('/{contract}/documents/download/{media}', [ContractController::class, 'downloadDocument'])
+            ->name('documents.download'); // Ensure this line is present
     });
 });
 

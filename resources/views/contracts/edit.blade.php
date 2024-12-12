@@ -14,28 +14,43 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
-                    <form action="{{ route('contracts.update', $contract->id) }}" method="POST" class="space-y-6">
+                    <form action="{{ route('contracts.update', $contract->id) }}" method="POST" class="space-y-6" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <!-- Contract Information -->
                         <div class="bg-gray-50 p-4 rounded-lg space-y-4">
                             <h3 class="text-lg font-medium text-gray-900">Contract Information</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <!-- Contract Name -->
+                                <div>
+                                    <label for="name" class="block text-sm font-medium text-gray-700">Contract Name</label>
+                                    <input type="text" name="name" id="name" value="{{ old('name', $contract->name) }}" readonly
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-300 focus:ring-gray-300 bg-gray-200">
+                                    @error('name')
+                                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
                                 <!-- Tenant Selection -->
                                 <div>
                                     <label for="tenant_id" class="block text-sm font-medium text-gray-700">Tenant</label>
+                                    <div class="flex items-center">
                                     <select name="tenant_id" id="tenant_id" required
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                         <option value="">Select Tenant</option>
                                         @foreach($tenants as $tenant)
-                                            <option value="{{ $tenant->id }}" {{ (old('tenant_id', $contract->tenant_id) == $tenant->id) ? 'selected' : '' }}>
+                                            <option value="{{ $tenant->id }}" {{ old('tenant_id', $contract->tenant_id) == $tenant->id ? 'selected' : '' }}>
                                                 {{ $tenant->fname }} ({{ $tenant->eid }})
                                             </option>
                                         @endforeach
                                     </select>
+                                    <a href="{{ route('tenants.create') }}" class="mt-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-2">
+                                        +
+                                    </a>
                                     @error('tenant_id')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
+                                    </div>
                                 </div>
 
                                 <!-- Property Selection -->
@@ -45,22 +60,14 @@
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                         <option value="">Select Property</option>
                                         @foreach($properties as $property)
-                                            <option value="{{ $property->id }}" {{ (old('property_id', $contract->property_id) == $property->id) ? 'selected' : '' }}>
-                                                {{ $property->name }} ({{ $property->community }})
-                                            </option>
+                                            @if($property->status === 'VACANT')
+                                                <option value="{{ $property->id }}" {{ old('property_id', $contract->property_id) == $property->id ? 'selected' : '' }}>
+                                                    {{ $property->name }} ({{ $property->community }})
+                                                </option>
+                                            @endif
                                         @endforeach
                                     </select>
                                     @error('property_id')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
-
-                                <!-- Contract Name -->
-                                <div>
-                                    <label for="name" class="block text-sm font-medium text-gray-700">Contract Name</label>
-                                    <input type="text" name="name" id="name" value="{{ old('name', $contract->name) }}" required
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('name')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
                                 </div>
@@ -105,22 +112,38 @@
                                     @enderror
                                 </div>
 
-                                <!-- Ejari -->
-                                <div>
-                                    <label for="ejari" class="block text-sm font-medium text-gray-700">Ejari</label>
-                                    <input type="text" name="ejari" id="ejari" value="{{ old('ejari', $contract->ejari) }}" required
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('ejari')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
+                                <!-- Ejari and Validity -->
+                                <div class="flex space-x-4">
+                                    <!-- Ejari -->
+                                    <div>
+                                        <label for="ejari" class="block text-sm font-medium text-gray-700">Ejari</label>
+                                        <label class="inline-flex items-center">
+                                            <input type="checkbox" name="ejari" id="ejari" value="1" {{ old('ejari', $contract->ejari === 'YES') ? 'checked' : '' }}
+                                                   class="hidden">
+                                            <span class="toggle-switch"></span>
+                                        </label>
+                                        @error('ejari')
+                                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                                        @enderror
+                                    </div>
 
-                                <!-- Validity -->
+                                    <!-- Validity -->
+                                    <div>
+                                        <label for="validity" class="block text-sm font-medium text-gray-700">Validity</label>
+                                        <label class="inline-flex items-center">
+                                            <input type="checkbox" name="validity" id="validity" value="1" {{ old('validity', $contract->validity === 'YES') ? 'checked' : '' }}
+                                                   class="hidden">
+                                            <span class="toggle-switch"></span>
+                                        </label>
+                                        @error('validity')
+                                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
                                 <div>
-                                    <label for="validity" class="block text-sm font-medium text-gray-700">Validity</label>
-                                    <input type="text" name="validity" id="validity" value="{{ old('validity', $contract->validity) }}" required
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    @error('validity')
+                                    <label for="cont_copy" class="block text-sm font-medium text-gray-700">Attach Signed Contract</label>
+                                    <input type="file" name="cont_copy[]" multiple class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    @error('cont_copy')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
                                 </div>
@@ -141,4 +164,37 @@
             </div>
         </div>
     </div>
+
+    <style>
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 34px;
+            height: 20px;
+            background-color: #ccc;
+            border-radius: 34px;
+            transition: background-color 0.2s;
+            cursor: pointer; /* Add cursor pointer for better UX */
+        }
+
+        .toggle-switch:before {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        input:checked + .toggle-switch {
+            background-color: #4CAF50; /* Change color when checked */
+        }
+
+        input:checked + .toggle-switch:before {
+            transform: translateX(14px); /* Move the switch when checked */
+        }
+    </style>
 </x-app-layout>

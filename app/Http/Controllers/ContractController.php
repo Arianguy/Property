@@ -82,7 +82,7 @@ class ContractController extends Controller
      */
     public function show(Contract $contract)
     {
-        $contract->load(['tenant', 'property']);
+        $contract->load(['tenant', 'property', 'media']);
         return view('contracts.show', compact('contract'));
     }
 
@@ -99,29 +99,52 @@ class ContractController extends Controller
     /**
      * Update the specified contract in storage.
      */
-    public function update(Request $request, Contract $contract)
+    public function update(Request $request, $id)
     {
-        $validated = $request->validate([
+        $request->validate([
             'tenant_id' => 'required|exists:tenants,id',
             'property_id' => 'required|exists:properties,id',
-            'name' => 'required|string|max:255',
             'cstart' => 'required|date|before:cend',
             'cend' => 'required|date|after:cstart',
             'amount' => 'required|numeric|min:0',
             'sec_amt' => 'required|numeric|min:0',
-            'ejari' => 'required|string|max:255',
-            'validity' => 'required|string|max:255',
+            'ejari' => 'nullable|boolean',
+            'validity' => 'nullable|boolean',
         ], [
-            'tenant_id.required' => 'The tenant field is required.',
-            'tenant_id.exists' => 'The selected tenant is invalid.',
-            'property_id.required' => 'The property field is required.',
-            'property_id.exists' => 'The selected property is invalid.',
             'cstart.before' => 'The contract start date must be before the end date.',
             'cend.after' => 'The contract end date must be after the start date.',
         ]);
 
-        $contract->update($validated);
+        // Retrieve the contract
+        $contract = Contract::findOrFail($id);
 
+        // Set the values based on the toggle state
+        $contract->ejari = $request->has('ejari') ? 'YES' : 'NO';
+        $contract->validity = $request->has('validity') ? 'YES' : 'NO';
+
+        // Save other fields as needed
+        $contract->tenant_id = $request->tenant_id;
+        $contract->property_id = $request->property_id;
+        $contract->cstart = $request->cstart;
+        $contract->cend = $request->cend;
+        $contract->amount = $request->amount;
+        $contract->sec_amt = $request->sec_amt;
+
+        // Save the contract
+        $contract->save();
+
+        // Handle the file uploads for contract attachments
+        if ($request->hasFile('cont_copy')) {
+            // Remove existing files in the media collection
+            $contract->clearMediaCollection('contracts_copy');
+
+            foreach ($request->file('cont_copy') as $file) {
+                $contract->addMedia($file)
+                    ->toMediaCollection('contracts_copy'); // Specify the media collection name
+            }
+        }
+
+        // Redirect or return response
         return redirect()->route('contracts.index')->with('success', 'Contract updated successfully.');
     }
 
@@ -132,5 +155,50 @@ class ContractController extends Controller
     {
         $contract->delete();
         return redirect()->route('contracts.index')->with('success', 'Contract deleted successfully.');
+    }
+
+    public function viewDocument($contractId, $mediaId)
+    {
+        $contract = Contract::findOrFail($contractId);
+
+        // Check if the user has permission to view contracts
+        if (!auth()->user()->can('view contracts')) {
+            abort(403);
+        }
+
+        // Retrieve the media associated with the contract
+        $media = $contract->getMedia('contracts_copy')->where('id', $mediaId)->firstOrFail();
+
+        // Return the file response
+        return response()->file($media->getPath());
+    }
+
+    public function downloadDocument($contractId, $mediaId)
+    {
+        $contract = Contract::findOrFail($contractId);
+
+        // Check if the user has permission to view contracts
+        if (!auth()->user()->can('view contracts')) {
+            abort(403, 'You do not have permission to view contracts.');
+        }
+
+        // Retrieve the media associated with the contract from the specific collection
+        $media = $contract->getMedia('contracts_copy')->where('id', $mediaId)->first();
+
+        // Log the media retrieval attempt
+        \Log::info('Attempting to download media', [
+            'contract_id' => $contractId,
+            'media_id' => $mediaId,
+            'media_found' => $media ? true : false,
+        ]);
+
+        // Check if the media item exists
+        if (!$media) {
+            \Log::error('Media item not found for Contract ID: ' . $contractId . ' and Media ID: ' . $mediaId);
+            abort(404, 'Media item not found');
+        }
+
+        // Return the file download response
+        return response()->download($media->getPath(), $media->file_name);
     }
 }
