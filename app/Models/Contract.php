@@ -13,15 +13,17 @@ class Contract extends Model implements HasMedia
     use HasFactory, InteractsWithMedia;
 
     protected $fillable = [
+        'name',
         'tenant_id',
         'property_id',
-        'name',
         'cstart',
         'cend',
         'amount',
         'sec_amt',
         'ejari',
         'validity',
+        'type',
+        'previous_contract_id'
     ];
 
     /**

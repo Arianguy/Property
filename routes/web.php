@@ -125,6 +125,16 @@ Route::middleware(['auth'])->group(function () {
 // Contract Management Routes
 Route::middleware(['auth'])->group(function () {
     Route::prefix('contracts')->name('contracts.')->group(function () {
+        // List/renewal routes first (no parameters)
+        Route::get('/renew', [ContractController::class, 'renewalList'])
+            ->middleware('permission:create contracts')
+            ->name('renew');
+
+        // Then routes with parameters
+        Route::get('/{contract}/renew', [ContractController::class, 'renewForm'])
+            ->middleware('permission:create contracts')
+            ->name('renew-form');
+
         Route::get('/', [ContractController::class, 'index'])
             ->middleware('permission:view contracts')
             ->name('index');
@@ -161,13 +171,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{contract}/documents/download/{media}', [ContractController::class, 'downloadDocument'])
             ->name('documents.download'); // Ensure this line is present
 
-        Route::get('/{contract}/renew', [ContractController::class, 'renewForm'])
-            ->middleware('permission:create contracts')
-            ->name('contracts.renew');
-
         Route::post('/{contract}/renew', [ContractController::class, 'processRenewal'])
             ->middleware('permission:create contracts')
-            ->name('contracts.process-renewal');
+            ->name('process-renewal');
     });
 });
 

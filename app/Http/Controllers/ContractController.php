@@ -203,6 +203,47 @@ class ContractController extends Controller
         return response()->download($media->getPath(), $media->file_name);
     }
 
+    public function renewalList()
+    {
+        \Log::info('renewalList method started');
+
+        // Check if view file exists
+        $viewPath = resource_path('views/contracts/renewal-list.blade.php');
+        \Log::info('View file exists: ' . (file_exists($viewPath) ? 'Yes' : 'No'), [
+            'path' => $viewPath
+        ]);
+
+        try {
+            // Log the SQL query
+            \DB::enableQueryLog();
+
+            $validContracts = Contract::where(function ($query) {
+                $query->where('type', 'fresh')
+                    ->orWhereDoesntHave('renewals');
+            })
+                ->with(['tenant', 'property'])
+                ->paginate(10);
+
+            // Log the executed query
+            \Log::info('Query executed:', [
+                'sql' => \DB::getQueryLog(),
+                'contract_count' => $validContracts->count()
+            ]);
+
+            \Log::info('Attempting to render view: contracts.renewal-list');
+
+            return view('contracts.renewal-list', compact('validContracts'));
+        } catch (\Exception $e) {
+            \Log::error('Error in renewalList: ', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
+    }
+
     public function renewForm(Contract $contract)
     {
         // Load the relationships
@@ -241,6 +282,8 @@ class ContractController extends Controller
             'sec_amt' => $validated['sec_amt'],
             'ejari' => $validated['ejari'],
             'validity' => $validated['validity'],
+            'type' => 'renewed',
+            'previous_contract_id' => $contract->id
         ]);
 
         return redirect()->route('contracts.show', $newContract)
