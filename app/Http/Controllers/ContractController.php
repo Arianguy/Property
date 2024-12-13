@@ -7,6 +7,7 @@ use App\Models\Tenant;
 use App\Models\Property;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class ContractController extends Controller
 {
@@ -200,5 +201,49 @@ class ContractController extends Controller
 
         // Return the file download response
         return response()->download($media->getPath(), $media->file_name);
+    }
+
+    public function renewForm(Contract $contract)
+    {
+        // Load the relationships
+        $contract->load(['tenant', 'property']);
+
+        // Calculate suggested new dates
+        $suggestedStartDate = Carbon::parse($contract->cend)->addDay();
+        $suggestedEndDate = Carbon::parse($suggestedStartDate)->addYear();
+
+        return view('contracts.renew', compact('contract', 'suggestedStartDate', 'suggestedEndDate'));
+    }
+
+    public function processRenewal(Request $request, Contract $contract)
+    {
+        // Validate the renewal request
+        $validated = $request->validate([
+            'cstart' => 'required|date|after:' . $contract->cend,
+            'cend' => 'required|date|after:cstart',
+            'amount' => 'required|numeric|min:0',
+            'sec_amt' => 'required|numeric|min:0',
+            'ejari' => 'required|string|max:255',
+            'validity' => 'required|string|max:255',
+        ]);
+
+        // Generate a new contract number
+        $newContractName = $this->generateUniqueRandomName();
+
+        // Create new contract with existing tenant and property
+        $newContract = Contract::create([
+            'name' => $newContractName,
+            'tenant_id' => $contract->tenant_id,
+            'property_id' => $contract->property_id,
+            'cstart' => $validated['cstart'],
+            'cend' => $validated['cend'],
+            'amount' => $validated['amount'],
+            'sec_amt' => $validated['sec_amt'],
+            'ejari' => $validated['ejari'],
+            'validity' => $validated['validity'],
+        ]);
+
+        return redirect()->route('contracts.show', $newContract)
+            ->with('success', 'Contract renewed successfully.');
     }
 }

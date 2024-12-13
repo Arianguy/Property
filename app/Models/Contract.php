@@ -39,4 +39,14 @@ class Contract extends Model implements HasMedia
     {
         return $this->belongsTo(Property::class);
     }
+
+    public function previousContract()
+    {
+        return $this->belongsTo(Contract::class, 'previous_contract_id');
+    }
+
+    public function renewals()
+    {
+        return $this->hasMany(Contract::class, 'previous_contract_id');
+    }
 }

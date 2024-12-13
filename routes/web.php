@@ -160,6 +160,14 @@ Route::middleware(['auth'])->group(function () {
         // Route for downloading documents
         Route::get('/{contract}/documents/download/{media}', [ContractController::class, 'downloadDocument'])
             ->name('documents.download'); // Ensure this line is present
+
+        Route::get('/{contract}/renew', [ContractController::class, 'renewForm'])
+            ->middleware('permission:create contracts')
+            ->name('contracts.renew');
+
+        Route::post('/{contract}/renew', [ContractController::class, 'processRenewal'])
+            ->middleware('permission:create contracts')
+            ->name('contracts.process-renewal');
     });
 });
 
