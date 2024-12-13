@@ -14,29 +14,140 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
-                    <!-- Previous Contract Details -->
-                    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">Previous Contract Details</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-sm text-gray-600">Previous Start Date: {{ $contract->cstart }}</p>
-                                <p class="text-sm text-gray-600">Previous End Date: {{ $contract->cend }}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-600">Previous Amount: {{ number_format($contract->amount, 2) }}</p>
-                                <p class="text-sm text-gray-600">Previous Security Deposit: {{ number_format($contract->sec_amt, 2) }}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Renewal Form -->
                     <form action="{{ route('contracts.process-renewal', $contract->id) }}" method="POST" class="space-y-6" enctype="multipart/form-data">
                         @csrf
-                        <!-- Add your form fields here -->
-                        <!-- Similar to create form but with pre-filled tenant and property -->
+                        <!-- Previous Contract Details -->
+                        <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Previous Contract Details</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-600">Previous Start Date: {{ $contract->cstart }}</p>
+                                    <p class="text-sm text-gray-600">Previous End Date: {{ $contract->cend }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Previous Amount: {{ number_format($contract->amount, 2) }}</p>
+                                    <p class="text-sm text-gray-600">Previous Security Deposit: {{ number_format($contract->sec_amt, 2) }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Renewal Form -->
+                        <div class="bg-gray-50 p-4 rounded-lg space-y-4">
+                            <h3 class="text-lg font-medium text-gray-900">Contract Information</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <!-- New Contract Name (Read-Only) -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">New Contract Name</label>
+                                    <input type="text" value="{{ $newContractName }}" readonly class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100" />
+                                </div>
+
+                                <!-- Tenant Information (Read-Only) -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Tenant</label>
+                                    <input type="text" value="{{ $contract->tenant->fname }} ({{ $contract->tenant->eid }})" readonly class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100" />
+                                </div>
+
+                                <!-- Property Information (Read-Only) -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Property</label>
+                                    <input type="text" value="{{ $contract->property->name }} ({{ $contract->property->community }})" readonly class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100" />
+                                </div>
+
+                                <!-- Start Date -->
+                                <div>
+                                    <label for="cstart" class="block text-sm font-medium text-gray-700">Start Date</label>
+                                    <input type="date" name="cstart" id="cstart" value="{{ old('cstart', $suggestedStartDate->toDateString()) }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                </div>
+
+                                <!-- End Date -->
+                                <div>
+                                    <label for="cend" class="block text-sm font-medium text-gray-700">End Date</label>
+                                    <input type="date" name="cend" id="cend" value="{{ old('cend', $suggestedEndDate->toDateString()) }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                </div>
+
+                                <!-- Contract Amount -->
+                                <div>
+                                    <label for="amount" class="block text-sm font-medium text-gray-700">Contract Amount</label>
+                                    <input type="number" step="0.01" name="amount" id="amount" value="{{ old('amount', $contract->amount) }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                </div>
+
+                                <!-- Security Amount -->
+                                <div>
+                                    <label for="sec_amt" class="block text-sm font-medium text-gray-700">Security Amount</label>
+                                    <input type="number" step="0.01" name="sec_amt" id="sec_amt" value="{{ old('sec_amt', $contract->sec_amt) }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                </div>
+
+                                <!-- Ejari and Validity -->
+                                <div class="flex space-x-4">
+                                    <div>
+                                        <label for="ejari" class="block text-sm font-medium text-gray-700">Ejari</label>
+                                        <label class="inline-flex items-center">
+                                            <input type="checkbox" name="ejari" id="ejari" value="1" {{ old('ejari', $contract->ejari === 'YES') ? 'checked' : '' }} class="hidden">
+                                            <span class="toggle-switch"></span>
+                                        </label>
+                                    </div>
+
+                                    <div>
+                                        <label for="validity" class="block text-sm font-medium text-gray-700">Validity</label>
+                                        <label class="inline-flex items-center">
+                                            <input type="checkbox" name="validity" id="validity" value="1" {{ old('validity', $contract->validity === 'YES') ? 'checked' : '' }} class="hidden">
+                                            <span class="toggle-switch"></span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="cont_copy" class="block text-sm font-medium text-gray-700">Attach Signed Contract</label>
+                                    <input type="file" name="cont_copy[]" multiple class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="flex justify-end space-x-3">
+                            <button type="reset" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                                Reset Form
+                            </button>
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                Submit Renewal
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+    <style>
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 34px;
+            height: 20px;
+            background-color: #ccc;
+            border-radius: 34px;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .toggle-switch:before {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        input:checked + .toggle-switch {
+            background-color: #4CAF50;
+        }
+
+        input:checked + .toggle-switch:before {
+            transform: translateX(14px);
+        }
+    </style>
 </x-app-layout>

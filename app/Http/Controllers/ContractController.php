@@ -205,18 +205,12 @@ class ContractController extends Controller
 
     public function renewalList()
     {
-        \Log::info('renewalList method started');
-
-        // Check if view file exists
-        $viewPath = resource_path('views/contracts/renewal-list.blade.php');
-        \Log::info('View file exists: ' . (file_exists($viewPath) ? 'Yes' : 'No'), [
-            'path' => $viewPath
+        \Log::info('Accessing renewalList method', [
+            'url' => request()->fullUrl(),
+            'method' => request()->method()
         ]);
 
         try {
-            // Log the SQL query
-            \DB::enableQueryLog();
-
             $validContracts = Contract::where(function ($query) {
                 $query->where('type', 'fresh')
                     ->orWhereDoesntHave('renewals');
@@ -224,22 +218,9 @@ class ContractController extends Controller
                 ->with(['tenant', 'property'])
                 ->paginate(10);
 
-            // Log the executed query
-            \Log::info('Query executed:', [
-                'sql' => \DB::getQueryLog(),
-                'contract_count' => $validContracts->count()
-            ]);
-
-            \Log::info('Attempting to render view: contracts.renewal-list');
-
             return view('contracts.renewal-list', compact('validContracts'));
         } catch (\Exception $e) {
-            \Log::error('Error in renewalList: ', [
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
+            \Log::error('Error in renewalList: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -249,44 +230,73 @@ class ContractController extends Controller
         // Load the relationships
         $contract->load(['tenant', 'property']);
 
+        // Generate a new contract number
+        $newContractName = $this->generateUniqueRandomName();
+
         // Calculate suggested new dates
         $suggestedStartDate = Carbon::parse($contract->cend)->addDay();
-        $suggestedEndDate = Carbon::parse($suggestedStartDate)->addYear();
+        $suggestedEndDate = Carbon::parse($suggestedStartDate)->addYear()->subDay();
 
-        return view('contracts.renew', compact('contract', 'suggestedStartDate', 'suggestedEndDate'));
+        // Pass the existing tenant and property details along with the new contract name
+        return view('contracts.renew', compact('contract', 'suggestedStartDate', 'suggestedEndDate', 'newContractName'));
     }
 
     public function processRenewal(Request $request, Contract $contract)
     {
-        // Validate the renewal request
-        $validated = $request->validate([
-            'cstart' => 'required|date|after:' . $contract->cend,
-            'cend' => 'required|date|after:cstart',
-            'amount' => 'required|numeric|min:0',
-            'sec_amt' => 'required|numeric|min:0',
-            'ejari' => 'required|string|max:255',
-            'validity' => 'required|string|max:255',
-        ]);
+        \Log::info('Process Renewal method called for Contract ID: ' . $contract->id);
 
-        // Generate a new contract number
-        $newContractName = $this->generateUniqueRandomName();
+        try {
+            // Validate the renewal request
+            $validated = $request->validate([
+                'cstart' => 'required|date|after:' . $contract->cend,
+                'cend' => 'required|date|after:cstart',
+                'amount' => 'required|numeric|min:0',
+                'sec_amt' => 'required|numeric|min:0',
+                'ejari' => 'required|string|max:255',
+                'validity' => 'required|string|max:255',
+            ]);
 
-        // Create new contract with existing tenant and property
-        $newContract = Contract::create([
-            'name' => $newContractName,
-            'tenant_id' => $contract->tenant_id,
-            'property_id' => $contract->property_id,
-            'cstart' => $validated['cstart'],
-            'cend' => $validated['cend'],
-            'amount' => $validated['amount'],
-            'sec_amt' => $validated['sec_amt'],
-            'ejari' => $validated['ejari'],
-            'validity' => $validated['validity'],
-            'type' => 'renewed',
-            'previous_contract_id' => $contract->id
-        ]);
+            // Log the validated data for debugging
+            \Log::info('Validated Data for Renewal:', $validated);
 
-        return redirect()->route('contracts.show', $newContract)
-            ->with('success', 'Contract renewed successfully.');
+            // Generate a new contract number
+            $newContractName = $this->generateUniqueRandomName();
+
+            // Create new contract with existing tenant and property
+            $newContract = Contract::create([
+                'name' => $newContractName,
+                'tenant_id' => $contract->tenant_id,
+                'property_id' => $contract->property_id,
+                'cstart' => $validated['cstart'],
+                'cend' => $validated['cend'],
+                'amount' => $validated['amount'],
+                'sec_amt' => $validated['sec_amt'],
+                'ejari' => $validated['ejari'],
+                'validity' => $validated['validity'],
+                'type' => 'renewed',
+                'previous_contract_id' => $contract->id
+            ]);
+
+            // Log the new contract creation
+            \Log::info('New Contract Created:', ['contract_id' => $newContract->id]);
+
+            // Handle the file uploads for contract attachments
+            if ($request->hasFile('cont_copy')) {
+                foreach ($request->file('cont_copy') as $file) {
+                    $newContract->addMedia($file)
+                        ->toMediaCollection('contracts_copy'); // Specify the media collection name
+                }
+            }
+
+            // Redirect to the contract show page with success message
+            return redirect()->route('contracts.show', $newContract->id)
+                ->with('success', 'Contract renewed successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation Error during Contract Renewal:', $e->errors());
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Unexpected Error during Contract Renewal:', $e->getMessage());
+            return redirect()->back()->with('error', 'An unexpected error occurred while renewing the contract.');
+        }
     }
 }

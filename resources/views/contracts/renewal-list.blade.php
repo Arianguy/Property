@@ -28,6 +28,8 @@
                                         <th class="py-2 px-4 border-b">Property</th>
                                         <th class="py-2 px-4 border-b">Start Date</th>
                                         <th class="py-2 px-4 border-b">End Date</th>
+                                        <th class="py-2 px-4 border-b">Rent</th>
+                                        <th class="py-2 px-4 border-b">Sec Deposit</th>
                                         <th class="py-2 px-4 border-b">Actions</th>
                                     </tr>
                                 </thead>
@@ -39,6 +41,8 @@
                                             <td class="py-2 px-4 border-b">{{ $contract->property->name }}</td>
                                             <td class="py-2 px-4 border-b">{{ $contract->cstart }}</td>
                                             <td class="py-2 px-4 border-b">{{ $contract->cend }}</td>
+                                            <td class="py-2 px-4 border-b">{{ $contract->amount }}</td>
+                                            <td class="py-2 px-4 border-b">{{ $contract->sec_amt }}</td>
                                             <td class="py-2 px-4 border-b">
                                                 <a href="{{ route('contracts.renew-form', $contract->id) }}"
                                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
