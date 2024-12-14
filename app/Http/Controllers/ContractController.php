@@ -8,6 +8,7 @@ use App\Models\Property;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class ContractController extends Controller
 {
@@ -52,6 +53,9 @@ class ContractController extends Controller
 
         // Create the contract with the generated name
         $contract = Contract::create(array_merge($validated, ['name' => $randomName]));
+
+        // Update the property's status to 'LEASED'
+        $contract->property->update(['status' => 'LEASED']);
 
         return redirect()->route('contracts.index')->with('success', 'Contract created successfully.');
     }
@@ -206,15 +210,13 @@ class ContractController extends Controller
     public function renewalList()
     {
         \Log::info('Accessing renewalList method', [
-            'url' => request()->fullUrl(),
+            'url'    => request()->fullUrl(),
             'method' => request()->method()
         ]);
 
         try {
-            $validContracts = Contract::where(function ($query) {
-                $query->where('type', 'fresh')
-                    ->orWhereDoesntHave('renewals');
-            })
+            $validContracts = Contract::where('validity', 'YES')
+                ->whereDoesntHave('renewals')
                 ->with(['tenant', 'property'])
                 ->paginate(10);
 
@@ -225,6 +227,9 @@ class ContractController extends Controller
         }
     }
 
+    /**
+     * Show the form for renewing the specified contract.
+     */
     public function renewForm(Contract $contract)
     {
         // Load the relationships
@@ -241,6 +246,9 @@ class ContractController extends Controller
         return view('contracts.renew', compact('contract', 'suggestedStartDate', 'suggestedEndDate', 'newContractName'));
     }
 
+    /**
+     * Process the renewal of the specified contract.
+     */
     public function processRenewal(Request $request, Contract $contract)
     {
         \Log::info('Process Renewal method called for Contract ID: ' . $contract->id);
@@ -248,12 +256,17 @@ class ContractController extends Controller
         try {
             // Validate the renewal request
             $validated = $request->validate([
-                'cstart' => 'required|date|after:' . $contract->cend,
-                'cend' => 'required|date|after:cstart',
-                'amount' => 'required|numeric|min:0',
-                'sec_amt' => 'required|numeric|min:0',
-                'ejari' => 'required|string|max:255',
-                'validity' => 'required|string|max:255',
+                'cstart'     => 'required|date|after:' . $contract->cend,
+                'cend'       => 'required|date|after:cstart',
+                'amount'     => 'required|numeric|min:0',
+                'sec_amt'    => 'required|numeric|min:0',
+                'ejari'      => 'required|in:0,1',
+                'validity'   => 'required|in:0,1',
+            ], [
+                'cstart.after' => 'The contract start date must be after the previous end date.',
+                'cend.after'   => 'The contract end date must be after the start date.',
+                'ejari.in'     => 'Invalid value for Ejari.',
+                'validity.in'  => 'Invalid value for Validity.',
             ]);
 
             // Log the validated data for debugging
@@ -262,23 +275,22 @@ class ContractController extends Controller
             // Generate a new contract number
             $newContractName = $this->generateUniqueRandomName();
 
-            // Create new contract with existing tenant and property
-            $newContract = Contract::create([
-                'name' => $newContractName,
-                'tenant_id' => $contract->tenant_id,
-                'property_id' => $contract->property_id,
-                'cstart' => $validated['cstart'],
-                'cend' => $validated['cend'],
-                'amount' => $validated['amount'],
-                'sec_amt' => $validated['sec_amt'],
-                'ejari' => $validated['ejari'],
-                'validity' => $validated['validity'],
-                'type' => 'renewed',
-                'previous_contract_id' => $contract->id
-            ]);
+            // Create a new contract instance for the renewal
+            $newContract = new Contract();
+            $newContract->name = $newContractName;
+            $newContract->tenant_id = $contract->tenant_id;
+            $newContract->property_id = $contract->property_id;
+            $newContract->cstart = $validated['cstart'];
+            $newContract->cend = $validated['cend'];
+            $newContract->amount = $validated['amount'];
+            $newContract->sec_amt = $validated['sec_amt'];
+            $newContract->ejari = $validated['ejari'] == '1' ? 'YES' : 'NO';
+            $newContract->validity = $validated['validity'] == '1' ? 'YES' : 'NO';
+            $newContract->type = 'renewed';
+            $newContract->previous_contract_id = $contract->id;
 
-            // Log the new contract creation
-            \Log::info('New Contract Created:', ['contract_id' => $newContract->id]);
+            // Save the new contract
+            $newContract->save();
 
             // Handle the file uploads for contract attachments
             if ($request->hasFile('cont_copy')) {
@@ -287,6 +299,13 @@ class ContractController extends Controller
                         ->toMediaCollection('contracts_copy'); // Specify the media collection name
                 }
             }
+
+            // Set the validity of the previous contract to 'NO'
+            $contract->update(['validity' => 'NO']);
+            \Log::info('Previous Contract Validity set to NO for Contract ID: ' . $contract->id);
+
+            // Update the property's status to 'LEASED'
+            $newContract->property->update(['status' => 'LEASED']);
 
             // Redirect to the contract show page with success message
             return redirect()->route('contracts.show', $newContract->id)
@@ -297,6 +316,27 @@ class ContractController extends Controller
         } catch (\Exception $e) {
             \Log::error('Unexpected Error during Contract Renewal:', $e->getMessage());
             return redirect()->back()->with('error', 'An unexpected error occurred while renewing the contract.');
+        }
+    }
+
+    /**
+     * Terminate the specified contract.
+     */
+    public function terminate($id)
+    {
+        try {
+            $contract = Contract::findOrFail($id);
+            $contract->update(['validity' => 'NO']);
+
+            // Update the property's status to 'VACANT'
+            $contract->property->update(['status' => 'VACANT']);
+
+            Log::info('Contract terminated successfully.', ['contract_id' => $id]);
+
+            return redirect()->route('contracts.index')->with('success', 'Contract terminated successfully.');
+        } catch (\Exception $e) {
+            Log::error('Error terminating contract: ' . $e->getMessage(), ['contract_id' => $id]);
+            return redirect()->back()->with('error', 'Failed to terminate the contract.');
         }
     }
 }

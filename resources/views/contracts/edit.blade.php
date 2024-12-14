@@ -114,12 +114,12 @@
 
                                 <!-- Ejari and Validity -->
                                 <div class="flex space-x-4">
-                                    <!-- Ejari -->
                                     <div>
                                         <label for="ejari" class="block text-sm font-medium text-gray-700">Ejari</label>
                                         <label class="inline-flex items-center">
-                                            <input type="checkbox" name="ejari" id="ejari" value="1" {{ old('ejari', $contract->ejari === 'YES') ? 'checked' : '' }}
-                                                   class="hidden">
+                                            <!-- Hidden input to send '0' when checkbox is unchecked -->
+                                            <input type="hidden" name="ejari" value="0">
+                                            <input type="checkbox" name="ejari" id="ejari" value="1" {{ old('ejari', $contract->ejari) === 'YES' ? 'checked' : '' }} class="hidden">
                                             <span class="toggle-switch"></span>
                                         </label>
                                         @error('ejari')
@@ -127,12 +127,12 @@
                                         @enderror
                                     </div>
 
-                                    <!-- Validity -->
                                     <div>
                                         <label for="validity" class="block text-sm font-medium text-gray-700">Validity</label>
                                         <label class="inline-flex items-center">
-                                            <input type="checkbox" name="validity" id="validity" value="1" {{ old('validity', $contract->validity === 'YES') ? 'checked' : '' }}
-                                                   class="hidden">
+                                            <!-- Hidden input to send '0' when checkbox is unchecked -->
+                                            <input type="hidden" name="validity" value="0">
+                                            <input type="checkbox" name="validity" id="validity" value="1" {{ old('validity', $contract->validity) === 'YES' ? 'checked' : '' }} class="hidden">
                                             <span class="toggle-switch"></span>
                                         </label>
                                         @error('validity')

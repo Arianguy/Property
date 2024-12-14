@@ -175,19 +175,25 @@ Route::middleware(['auth'])->group(function () {
             ->middleware('permission:create contracts')
             ->name('process-renewal');
 
+        // // Route to display the renewal form
+        // Route::get('/contracts/{contract}/renew', [ContractController::class, 'renewForm'])
+        //     ->middleware('permission:renew contracts')
+        //     ->name('contracts.renew-form');
+
+        // // Route to process the renewal
         // Route::post('/contracts/{contract}/renew', [ContractController::class, 'processRenewal'])
-        //     ->middleware('permission:create contracts')
+        //     ->middleware('permission:renew contracts')
         //     ->name('contracts.process-renewal');
 
-        // Route to display the renewal form
-        Route::get('/contracts/{contract}/renew', [ContractController::class, 'renewForm'])
-            ->middleware('permission:renew contracts')
-            ->name('contracts.renew-form');
+        // // Route to display the renewal list
+        // Route::get('/contracts/renewal-list', [ContractController::class, 'renewalList'])
+        //     ->middleware('permission:view contracts')
+        //     ->name('contracts.renewal-list');
 
-        // Route to process the renewal
-        Route::post('/contracts/{contract}/renew', [ContractController::class, 'processRenewal'])
-            ->middleware('permission:renew contracts')
-            ->name('contracts.process-renewal');
+        // Terminate route
+        Route::put('/{contract}/terminate', [ContractController::class, 'terminate'])
+            ->middleware(['permission:create contracts'])
+            ->name('terminate');
     });
 });
 

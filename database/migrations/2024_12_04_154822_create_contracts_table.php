@@ -24,8 +24,8 @@ return new class extends Migration
             $table->date('cend');
             $table->decimal('amount', 10, 2);
             $table->decimal('sec_amt', 10, 2);
-            $table->string('ejari');
-            $table->string('validity');
+            $table->string('ejari')->default('NO');
+            $table->string('validity')->default('NO');
             $table->timestamps();
         });
     }

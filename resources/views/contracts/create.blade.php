@@ -125,13 +125,17 @@
 
                                 <!-- Validity -->
                                 <div>
-                                    <label for="validity" class="block text-sm font-medium text-gray-700">Validity</label>
-                                    <input type="text" name="validity" id="validity" value="{{ old('validity') }}" required
+                                    <label for="validity" class="block text-sm font-medium text-gray-700"></label>
+                                    <input type="hidden" name="validity" id="validity" value="YES"
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     @error('validity')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
                                 </div>
+
+
+
+
                             </div>
                         </div>
 

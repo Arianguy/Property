@@ -41,8 +41,8 @@
                                             <td class="py-2 px-4 border-b">{{ $contract->property->name }}</td>
                                             <td class="py-2 px-4 border-b">{{ $contract->cstart }}</td>
                                             <td class="py-2 px-4 border-b">{{ $contract->cend }}</td>
-                                            <td class="py-2 px-4 border-b">{{ $contract->amount }}</td>
-                                            <td class="py-2 px-4 border-b">{{ $contract->sec_amt }}</td>
+                                            <td class="py-2 px-4 border-b">{{ number_format($contract->amount, 2) }}</td>
+                                            <td class="py-2 px-4 border-b">{{ number_format($contract->sec_amt, 2) }}</td>
                                             <td class="py-2 px-4 border-b">
                                                 <a href="{{ route('contracts.renew-form', $contract->id) }}"
                                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
@@ -54,6 +54,8 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- Pagination Links -->
                         <div class="mt-4">
                             {{ $validContracts->links() }}
                         </div>
