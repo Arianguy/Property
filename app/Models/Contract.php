@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Support\Facades\DB;
 
 class Contract extends Model implements HasMedia
 {
@@ -28,19 +27,6 @@ class Contract extends Model implements HasMedia
     ];
 
     /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'ejari'    => 'string',
-        'validity' => 'string',
-        // If you decide to switch to boolean, update accordingly
-        // 'ejari'    => 'boolean',
-        // 'validity' => 'boolean',
-    ];
-
-    /**
      * Get the tenant that owns the contract.
      */
     public function tenant(): BelongsTo
@@ -56,38 +42,66 @@ class Contract extends Model implements HasMedia
         return $this->belongsTo(Property::class);
     }
 
+    /**
+     * Get the previous contract for the renewal.
+     */
     public function previousContract()
     {
         return $this->belongsTo(Contract::class, 'previous_contract_id');
     }
 
+    /**
+     * Get the renewals for the contract.
+     */
     public function renewals()
     {
         return $this->hasMany(Contract::class, 'previous_contract_id');
     }
 
-    public function store(Request $request)
+    /**
+     * Recursively retrieve all renewals associated with the contract.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allRenewals()
     {
-        DB::beginTransaction();
+        $allRenewals = collect();
 
-        try {
-            $validated = $request->validate([
-                // validation rules
-            ]);
-
-            $randomName = $this->generateUniqueRandomName();
-            $contract = Contract::create(array_merge($validated, ['name' => $randomName]));
-
-            // Update property status
-            $contract->property->update(['status' => 'LEASED']);
-
-            DB::commit();
-
-            return redirect()->route('contracts.index')->with('success', 'Contract created successfully.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error creating contract: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Failed to create the contract.');
+        foreach ($this->renewals as $renewal) {
+            $allRenewals->push($renewal);
+            $allRenewals = $allRenewals->merge($renewal->allRenewals());
         }
+
+        return $allRenewals;
+    }
+
+    /**
+     * Recursively retrieve all previous contracts (ancestors).
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allAncestors()
+    {
+        $allAncestors = collect();
+
+        if ($this->previousContract) {
+            $allAncestors->push($this->previousContract);
+            $allAncestors = $allAncestors->merge($this->previousContract->allAncestors());
+        }
+
+        return $allAncestors;
+    }
+
+    /**
+     * Register the media collections.
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('contracts_copy')
+            ->useDisk('private')
+            ->acceptsFile(function ($file) {
+                return in_array($file->mimeType, ['application/pdf', 'image/jpeg', 'image/png']);
+            })
+            ->singleFile();
     }
 }

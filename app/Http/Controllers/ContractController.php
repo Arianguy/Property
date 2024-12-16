@@ -87,8 +87,28 @@ class ContractController extends Controller
      */
     public function show(Contract $contract)
     {
-        $contract->load(['tenant', 'property', 'media']);
-        return view('contracts.show', compact('contract'));
+        // Eager load immediate relationships
+        $contract->load(['tenant', 'property', 'renewals.tenant', 'renewals.property', 'media']);
+
+        // Fetch all renewals recursively
+        $allRenewals = $contract->allRenewals();
+
+        // Fetch all ancestors recursively
+        $allAncestors = $contract->allAncestors();
+
+        // Log the number of renewals fetched
+        Log::info('Renewals fetched for Contract:', [
+            'contract_id' => $contract->id,
+            'renewal_count' => $allRenewals->count()
+        ]);
+
+        // Log the number of ancestors fetched
+        Log::info('Ancestors fetched for Contract:', [
+            'contract_id' => $contract->id,
+            'ancestor_count' => $allAncestors->count()
+        ]);
+
+        return view('contracts.show', compact('contract', 'allRenewals', 'allAncestors'));
     }
 
     /**
@@ -251,8 +271,6 @@ class ContractController extends Controller
      */
     public function processRenewal(Request $request, Contract $contract)
     {
-        \Log::info('Process Renewal method called for Contract ID: ' . $contract->id);
-
         try {
             // Validate the renewal request
             $validated = $request->validate([
@@ -260,19 +278,12 @@ class ContractController extends Controller
                 'cend'       => 'required|date|after:cstart',
                 'amount'     => 'required|numeric|min:0',
                 'sec_amt'    => 'required|numeric|min:0',
-                'ejari'      => 'required|in:0,1',
-                'validity'   => 'required|in:0,1',
-            ], [
-                'cstart.after' => 'The contract start date must be after the previous end date.',
-                'cend.after'   => 'The contract end date must be after the start date.',
-                'ejari.in'     => 'Invalid value for Ejari.',
-                'validity.in'  => 'Invalid value for Validity.',
+                'ejari'      => 'required|string|max:255',
+                'validity'   => 'required|string|max:255',
+                // Add other validation rules as necessary
             ]);
 
-            // Log the validated data for debugging
-            \Log::info('Validated Data for Renewal:', $validated);
-
-            // Generate a new contract number
+            // Generate a unique contract name
             $newContractName = $this->generateUniqueRandomName();
 
             // Create a new contract instance for the renewal
@@ -296,13 +307,12 @@ class ContractController extends Controller
             if ($request->hasFile('cont_copy')) {
                 foreach ($request->file('cont_copy') as $file) {
                     $newContract->addMedia($file)
-                        ->toMediaCollection('contracts_copy'); // Specify the media collection name
+                        ->toMediaCollection('contracts_copy');
                 }
             }
 
             // Set the validity of the previous contract to 'NO'
             $contract->update(['validity' => 'NO']);
-            \Log::info('Previous Contract Validity set to NO for Contract ID: ' . $contract->id);
 
             // Update the property's status to 'LEASED'
             $newContract->property->update(['status' => 'LEASED']);
@@ -311,10 +321,10 @@ class ContractController extends Controller
             return redirect()->route('contracts.show', $newContract->id)
                 ->with('success', 'Contract renewed successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Validation Error during Contract Renewal:', $e->errors());
+            Log::error('Validation Error during Contract Renewal:', $e->errors());
             return redirect()->back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
-            \Log::error('Unexpected Error during Contract Renewal:', $e->getMessage());
+            Log::error('Unexpected Error during Contract Renewal:', $e->getMessage());
             return redirect()->back()->with('error', 'An unexpected error occurred while renewing the contract.');
         }
     }
@@ -338,5 +348,32 @@ class ContractController extends Controller
             Log::error('Error terminating contract: ' . $e->getMessage(), ['contract_id' => $id]);
             return redirect()->back()->with('error', 'Failed to terminate the contract.');
         }
+    }
+
+    /**
+     * Download a media file associated with a contract.
+     */
+    public function downloadMedia($contractId, $mediaId)
+    {
+        $contract = Contract::findOrFail($contractId);
+
+        // Retrieve the media associated with the contract from the specific collection
+        $media = $contract->getMedia('contracts_copy')->where('id', $mediaId)->first();
+
+        // Log the media retrieval attempt
+        Log::info('Attempting to download media', [
+            'contract_id' => $contractId,
+            'media_id' => $mediaId,
+            'media_found' => $media ? true : false,
+        ]);
+
+        // Check if the media item exists
+        if (!$media) {
+            Log::error('Media item not found for Contract ID: ' . $contractId . ' and Media ID: ' . $mediaId);
+            abort(404, 'Media item not found');
+        }
+
+        // Return the file download response
+        return response()->download($media->getPath(), $media->file_name);
     }
 }
