@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Contract;
+use App\Observers\ContractObserver;
+use App\Observers\PermissionObserver;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Permission\Models\Permission;
-use App\Observers\PermissionObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,5 +25,6 @@ class AppServiceProvider extends ServiceProvider
     {
         // Register the PermissionObserver
         Permission::observe(PermissionObserver::class);
+        Contract::observe(ContractObserver::class);
     }
 }

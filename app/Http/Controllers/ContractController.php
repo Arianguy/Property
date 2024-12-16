@@ -54,9 +54,6 @@ class ContractController extends Controller
         // Create the contract with the generated name
         $contract = Contract::create(array_merge($validated, ['name' => $randomName]));
 
-        // Update the property's status to 'LEASED'
-        $contract->property->update(['status' => 'LEASED']);
-
         return redirect()->route('contracts.index')->with('success', 'Contract created successfully.');
     }
 
