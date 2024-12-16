@@ -68,7 +68,11 @@
                                             @endcan
 
                                             @can('edit contracts')
-                                                <a href="{{ route('contracts.edit', $contract->id) }}" class="text-yellow-500 hover:underline">Edit</a>
+                                                @if($contract->validity === 'YES')
+                                                    <a href="{{ route('contracts.edit', $contract->id) }}" class="text-yellow-500 hover:underline">Edit</a>
+                                                @else
+                                                    <span class="text-gray-400 cursor-not-allowed" title="Cannot edit a terminated or renewed contract">Edit</span>
+                                                @endif
                                             @endcan
 
                                             @can('delete contracts')

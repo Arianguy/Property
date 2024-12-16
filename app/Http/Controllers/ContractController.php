@@ -143,9 +143,22 @@ class ContractController extends Controller
         // Retrieve the contract
         $contract = Contract::findOrFail($id);
 
-        // Set the values based on the toggle state
+        // Check if the contract is active
+        if ($contract->validity !== 'YES') {
+            return redirect()->back()->with('error', 'You cannot edit a terminated or renewed contract.');
+        }
+
+        // Check if the contract has been renewed
+        if ($contract->renewals()->exists()) {
+            // If renewed, force validity to 'NO'
+            $contract->validity = 'NO';
+        } else {
+            // Otherwise, set based on the checkbox
+            $contract->validity = $request->has('validity') ? 'YES' : 'NO';
+        }
+
+        // Set the Ejari value based on the toggle state
         $contract->ejari = $request->has('ejari') ? 'YES' : 'NO';
-        $contract->validity = $request->has('validity') ? 'YES' : 'NO';
 
         // Save other fields as needed
         $contract->tenant_id = $request->tenant_id;

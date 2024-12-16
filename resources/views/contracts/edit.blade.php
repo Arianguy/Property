@@ -35,33 +35,34 @@
                                 <div>
                                     <label for="tenant_id" class="block text-sm font-medium text-gray-700">Tenant</label>
                                     <div class="flex items-center">
-                                    <select name="tenant_id" id="tenant_id" required
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                        <option value="">Select Tenant</option>
-                                        @foreach($tenants as $tenant)
-                                            <option value="{{ $tenant->id }}" {{ old('tenant_id', $contract->tenant_id) == $tenant->id ? 'selected' : '' }}>
-                                                {{ $tenant->fname }} ({{ $tenant->eid }})
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <a href="{{ route('tenants.create') }}" class="mt-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-2">
-                                        +
-                                    </a>
-                                    @error('tenant_id')
-                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
+                                        <select name="tenant_id_display" id="tenant_id_display" required disabled
+                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-300 focus:ring-gray-300 bg-gray-200">
+                                            <option value="">Select Tenant</option>
+                                            @foreach($tenants as $tenant)
+                                                <option value="{{ $tenant->id }}" {{ old('tenant_id', $contract->tenant_id) == $tenant->id ? 'selected' : '' }}>
+                                                    {{ $tenant->fname }} ({{ $tenant->eid }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <a href="{{ route('tenants.create') }}" class="mt-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-2">
+                                            +
+                                        </a>
+                                        @error('tenant_id')
+                                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                                        @enderror
                                     </div>
+                                    <!-- Hidden input to retain tenant_id -->
+                                    <input type="hidden" name="tenant_id" value="{{ old('tenant_id', $contract->tenant_id) }}">
                                 </div>
 
                                 <!-- Property Selection -->
                                 <div>
                                     <label for="property_id" class="block text-sm font-medium text-gray-700">Property</label>
-                                    <select name="property_id" id="property_id" required
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                        <option value="">Select Property</option>
+                                    <select name="property_id_display" id="property_id_display" required disabled
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-300 focus:ring-gray-300 bg-gray-200">
                                         @foreach($properties as $property)
-                                            @if($property->status === 'VACANT')
-                                                <option value="{{ $property->id }}" {{ old('property_id', $contract->property_id) == $property->id ? 'selected' : '' }}>
+                                            @if($property->id === $contract->property_id)
+                                                <option value="{{ $property->id }}" selected>
                                                     {{ $property->name }} ({{ $property->community }})
                                                 </option>
                                             @endif
@@ -70,6 +71,8 @@
                                     @error('property_id')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
+                                    <!-- Hidden input to retain property_id -->
+                                    <input type="hidden" name="property_id" value="{{ old('property_id', $contract->property_id) }}">
                                 </div>
 
                                 <!-- Start Date -->
@@ -129,15 +132,21 @@
 
                                     <div>
                                         <label for="validity" class="block text-sm font-medium text-gray-700">Validity</label>
-                                        <label class="inline-flex items-center">
-                                            <!-- Hidden input to send '0' when checkbox is unchecked -->
-                                            <input type="hidden" name="validity" value="0">
-                                            <input type="checkbox" name="validity" id="validity" value="1" {{ old('validity', $contract->validity) === 'YES' ? 'checked' : '' }} class="hidden">
-                                            <span class="toggle-switch"></span>
-                                        </label>
-                                        @error('validity')
-                                            <span class="text-red-500 text-sm">{{ $message }}</span>
-                                        @enderror
+                                        @if($contract->renewals->isNotEmpty())
+                                            <div class="mt-2">
+                                                <span class="text-gray-700">NO</span>
+                                            </div>
+                                        @else
+                                            <label class="inline-flex items-center">
+                                                <!-- Hidden input to send '0' when checkbox is unchecked -->
+                                                <input type="hidden" name="validity" value="0">
+                                                <input type="checkbox" name="validity" id="validity" value="1" {{ old('validity', $contract->validity) === 'YES' ? 'checked' : '' }} class="hidden">
+                                                <span class="toggle-switch"></span>
+                                            </label>
+                                            @error('validity')
+                                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                                            @enderror
+                                        @endif
                                     </div>
                                 </div>
                                 <div>
