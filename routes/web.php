@@ -8,6 +8,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ContractController;
+use App\Http\Controllers\TransactionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -194,6 +195,22 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{contract}/terminate', [ContractController::class, 'terminate'])
             ->middleware(['permission:create contracts'])
             ->name('terminate');
+    });
+});
+Route::middleware(['auth'])->group(function () {
+    Route::prefix('transactions')->name('transactions.')->group(function () {
+
+        Route::get('/', [TransactionController::class, 'index'])
+            ->middleware('permission:view property')
+            ->name('index');
+
+        Route::get('/create/{contract}', [TransactionController::class, 'create'])
+            ->middleware('permission:create transactions')
+            ->name('create');
+
+        Route::post('/', [TransactionController::class, 'store'])
+            ->middleware('permission:create transactions')
+            ->name('store');
     });
 });
 

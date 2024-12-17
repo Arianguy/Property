@@ -25,7 +25,6 @@ class Transaction extends Model implements HasMedia
         'cheqstatus',
         'depositac',
         'remarks',
-        'cheq_img'
     ];
 
     public function Contract(): BelongsTo

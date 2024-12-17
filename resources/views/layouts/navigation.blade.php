@@ -127,12 +127,12 @@ class="bg-white border-gray-200 dark:bg-gray-900">
                 @mouseleave="propOpen = false"
                 class="absolute left-full top-0 mt-2 ml-2 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5"
             >
-                @can('view property')
-                <a href="{{ route('properties.index') }}"
-                   class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
-                    {{ __('Cash') }}
-                </a>
-                @endcan
+            @can('view transactions')
+            <a href="{{ route('transactions.index') }}"
+                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
+                {{ __('Cheq00') }}
+            </a>
+            @endcan
 
                 @can('create property')  <!-- This is the correct permission name from your seeder -->
                 <a href="{{ route('properties.create') }}"

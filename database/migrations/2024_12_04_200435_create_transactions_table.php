@@ -13,21 +13,18 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('contract_id')
-                ->constrained('contracts')
-                ->cascadedOnDelete();
-            $table->string('paytype');
+            $table->foreignId('contract_id')->constrained()->cascadeOnDelete();
+            $table->enum('paytype', ['CASH', 'CHEQUE'])->default('CHEQUE');
             $table->string('cheqno')->nullable();
             $table->string('cheqbank')->nullable();
             $table->decimal('cheqamt', 10, 2);
             $table->date('cheqdate');
-            $table->string('trans_type');
-            $table->string('narration');
+            $table->enum('trans_type', ['RENT', 'SECURITY'])->default('RENT');
+            $table->string('narration')->nullable();
             $table->date('depositdate')->nullable();
-            $table->string('cheqstatus')->nullable()->default('PENDING');
+            $table->enum('cheqstatus', ['PENDING', 'DEPOSITED', 'BOUNCED'])->default('PENDING');
             $table->string('depositac')->nullable();
-            $table->string('remarks')->nullable();
-            $table->string('cheq_img')->nullable();
+            $table->text('remarks')->nullable();
             $table->timestamps();
         });
     }
